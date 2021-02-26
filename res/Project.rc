@@ -1,0 +1,421 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "Resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_MAINFRAME           BITMAP                  "Toolbar.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DIALOG DIALOGEX 0, 0, 240, 94
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "Tahoma", 400, 0, 0xCC
+BEGIN
+    LTEXT           "This is Dialog.",IDC_STATIC,53,22,44,8
+    PUSHBUTTON      "Show MessageBox",IDC_BUTTON1,35,40,83,14
+END
+
+IDD_TESTDLG DIALOGEX 0, 0, 459, 212
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Demo Dialog"
+FONT 8, "Tahoma", 400, 0, 0xCC
+BEGIN
+    COMBOBOX        IDC_COMBO1,31,5,130,236,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "top",IDC_BUT11,"Button",BS_AUTORADIOBUTTON | WS_GROUP,16,31,27,10
+    CONTROL         "bottom",IDC_BUT12,"Button",BS_AUTORADIOBUTTON,16,41,39,10
+    CONTROL         "scaling",IDC_BUT13,"Button",BS_AUTORADIOBUTTON | WS_GROUP,82,31,37,10
+    CONTROL         "scrolling",IDC_BUT14,"Button",BS_AUTORADIOBUTTON,82,41,41,10
+    CONTROL         "Custom cursor",IDC_BUT21,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,55,62,10
+    CONTROL         "Equal size of tabs",IDC_BUT22,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,77,55,72,10
+    CONTROL         "Hide single tab",IDC_BUT23,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,66,63,10
+    CONTROL         "Remove tabs",IDC_BUT24,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,77,58,10
+    CONTROL         "Delete tab for drag outside",IDC_BUT25,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,88,103,10
+    CONTROL         "Show border",IDC_BUT31,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,102,57,10
+    CONTROL         "Show controls borders",IDC_BUT32,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,112,87,10
+    CONTROL         "Show images",IDC_BUT33,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,122,57,10
+    CONTROL         "Watch activity control",IDC_BUT41,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,134,86,10
+    CONTROL         "Bold font for selected tab",IDC_BUT42,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,144,105,10
+    CONTROL         "Show close button",IDC_BUT51,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,156,75,10
+    CONTROL         "Show menu button",IDC_BUT52,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,166,76,10
+    CONTROL         "Show scroll buttons",IDC_BUT53,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,87,161,78,10
+    PUSHBUTTON      "Enable / Disable",IDC_BUT61,6,180,66,13
+    PUSHBUTTON      "Enable All",IDC_BUT62,79,180,55,13
+    PUSHBUTTON      "Add",IDC_BUT63,6,195,42,13
+    PUSHBUTTON      "Delete",IDC_BUT64,52,195,42,13
+    PUSHBUTTON      "Delete All",IDC_BUT65,102,195,50,13
+    CONTROL         "",IDC_TABCTRL_BASE,"Static",SS_GRAYRECT,169,4,283,200
+    LTEXT           "Layout:",IDC_STATIC,8,21,26,8
+    LTEXT           "Style:",IDC_STATIC,8,7,20,8
+    LTEXT           "Behavior:",IDC_STATIC,75,21,32,8
+END
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Project"
+FONT 8, "Tahoma", 400, 0, 0xCC
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,15,WS_GROUP
+    RTEXT           "Author: Baradzenka Aleh",IDC_STATIC,43,17,98,8,SS_NOPREFIX
+    RTEXT           "baradzenka@gmail.com",IDC_STATIC,43,28,98,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_TESTDLG, DIALOG
+    BEGIN
+    END
+
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "Resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""Project.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "Project.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_MAINFRAME TOOLBAR 16, 15
+BEGIN
+    BUTTON      ID_EDIT_CUT
+    BUTTON      ID_EDIT_COPY
+    BUTTON      ID_EDIT_PASTE
+    SEPARATOR
+    BUTTON      ID_FILE_PRINT
+    SEPARATOR
+    BUTTON      ID_APP_ABOUT
+    SEPARATOR
+    BUTTON      ID_TESTDLG
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "Show Demo Dialog ...",        ID_TESTDLG
+        MENUITEM SEPARATOR
+        MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+    END
+    POPUP "!!! Action !!!"
+    BEGIN
+        POPUP "Layout"
+        BEGIN
+            MENUITEM "Top",                         ID_LAYOUT_TOP
+            MENUITEM "Bottom",                      ID_LAYOUT_BOTTOM
+        END
+        POPUP "Behavior"
+        BEGIN
+            MENUITEM "Scaling",                     ID_BEHAVIOR_SCALING
+            MENUITEM "Scrolling",                   ID_BEHAVIOR_SCROLLING
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Equal size",                  ID_EQUALSIZE
+        MENUITEM "Remove tabs",                 ID_TABSREMOVE
+        MENUITEM SEPARATOR
+        MENUITEM "Show close button",           ID_SHOWCLOSEBUTTON
+        MENUITEM "Show menu button",            ID_SHOWMENUBUTTON
+        MENUITEM "Show scroll buttons",         ID_SHOWSCROLLBUTTONS
+        MENUITEM SEPARATOR
+        MENUITEM "Show ClientEdge border",      ID_SHOWCLIENTEDGEBORDER
+        MENUITEM SEPARATOR
+        MENUITEM "Demo Dialog...",              ID_TESTDLG
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About Project...",           ID_APP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL, NOINVERT
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT, NOINVERT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT, NOINVERT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY, NOINVERT
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT, NOINVERT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL, NOINVERT
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT, NOINVERT
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL, NOINVERT
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription", "TabCtrl"
+            VALUE "FileVersion", "1.0"
+            VALUE "InternalName", "TabCtrl"
+            VALUE "OriginalFilename", "TabCtrl.exe"
+            VALUE "ProductName", "TabCtrl"
+            VALUE "ProductVersion", "1.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_ABOUTBOX AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_TESTDLG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "TabCtrl"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_APP_TITLE       "TabCtrl"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE
+BEGIN
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TESTDLG              "Show Demo Dialog\nShow Demo Dialog"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "Project.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

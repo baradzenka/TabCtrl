@@ -1,0 +1,31 @@
+//
+// PROJECT.RC2 - resources Microsoft Visual C++ does not edit directly
+//
+
+#ifdef APSTUDIO_INVOKED
+	#error this file is not editable by Microsoft Visual C++
+#endif //APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_IMAGES_TAB_NORMAL        PNG                "res/TabNormal.png"
+IDB_IMAGES_TAB_DISABLE       PNG                "res/TabDisable.png"
+IDB_IMAGES_SYSTEM            PNG                "res/System.png"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CURSOR1             CURSOR                  "res/Cursor.cur"
+
+
+/////////////////////////////////////////////////////////////////////////////
+
+
+
