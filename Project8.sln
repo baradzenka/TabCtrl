@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TabCtrl", "Project8.0.vcproj", "{4159A0C6-71AA-46D4-B87E-7D4DC1840982}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TabCtrl", "Project8.vcproj", "{4159A0C6-71AA-46D4-B87E-7D4DC1840982}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,8 +12,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4159A0C6-71AA-46D4-B87E-7D4DC1840982}.Debug|Win32.ActiveCfg = Debug|Win32
 		{4159A0C6-71AA-46D4-B87E-7D4DC1840982}.Debug|Win32.Build.0 = Debug|Win32
-		{4159A0C6-71AA-46D4-B87E-7D4DC1840982}.Debug|x64.ActiveCfg = Debug|Win32
-		{4159A0C6-71AA-46D4-B87E-7D4DC1840982}.Debug|x64.Build.0 = Debug|Win32
+		{4159A0C6-71AA-46D4-B87E-7D4DC1840982}.Debug|x64.ActiveCfg = Debug|x64
+		{4159A0C6-71AA-46D4-B87E-7D4DC1840982}.Debug|x64.Build.0 = Debug|x64
 		{4159A0C6-71AA-46D4-B87E-7D4DC1840982}.Release|Win32.ActiveCfg = Release|Win32
 		{4159A0C6-71AA-46D4-B87E-7D4DC1840982}.Release|Win32.Build.0 = Release|Win32
 		{4159A0C6-71AA-46D4-B87E-7D4DC1840982}.Release|x64.ActiveCfg = Release|x64
