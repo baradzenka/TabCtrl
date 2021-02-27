@@ -230,6 +230,7 @@ public:
 	bool m_bEqualTabsSize;
 	bool m_bEnableTabRemove;
 	bool m_bHideSingleTab;
+	bool m_bToolTip;
 	bool m_bShowButtonClose;
 	bool m_bShowButtonMenu;
 	bool m_bShowButtonsScroll;
@@ -369,6 +370,7 @@ TabCtrl::Private::Private(TabCtrl &owner) : o(owner)
 	m_bEqualTabsSize = false;
 	m_bEnableTabRemove = false;
 	m_bHideSingleTab = false;
+	m_bToolTip = true;
 	m_bShowButtonClose = true;
 	m_bShowButtonMenu = true;
 	m_bShowButtonsScroll = true;
@@ -1287,8 +1289,9 @@ int TabCtrl::Private::CalcTabWidth(HANDLE tab)
 /////////////////////////////////////////////////////////////////////////////
 // 
 BOOL TabCtrl::PreTranslateMessage(MSG *pMsg)
-{	if(p.m_pToolTip && p.m_pToolTip->m_hWnd)
-		p.m_pToolTip->RelayEvent(pMsg);
+{	if(p.m_bToolTip)
+		if(p.m_pToolTip && p.m_pToolTip->m_hWnd)
+			p.m_pToolTip->RelayEvent(pMsg);
 	return CWnd::PreTranslateMessage(pMsg);
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -1431,6 +1434,15 @@ void TabCtrl::HideSingleTab(bool hide)
 // 
 bool TabCtrl::IsHideSingleTab() const
 {	return p.m_bHideSingleTab;
+}
+/////////////////////////////////////////////////////////////////////////////
+// 
+void TabCtrl::EnableToolTip(bool enable)
+{	p.m_bToolTip = enable;
+}
+// 
+bool TabCtrl::IsToolTipEnable() const
+{	return p.m_bToolTip;
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

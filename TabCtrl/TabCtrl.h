@@ -210,6 +210,8 @@ public:
 	bool IsTabRemoveEnable() const;
 	void HideSingleTab(bool hide);   // true - hide control area if control has only one tab. 
 	bool IsHideSingleTab() const;
+	void EnableToolTip(bool enable);
+	bool IsToolTipEnable() const;
 		// 
 	void ShowButtonClose(bool show);
 	bool IsButtonCloseVisible() const;
