@@ -384,13 +384,15 @@ TabCtrl::Private::Private(TabCtrl &owner) : o(owner)
 }
 //
 TabCtrl::Private::~Private()
-{	::delete m_ImageSys.bmp;
+{	o.DestroyWindow();
+		// 
+	::delete m_ImageSys.bmp;
 	::delete m_ImageNormal.bmp;
 	::delete m_ImageDisable.bmp;
-	if(m_gdiPlusToken)
-		Gdiplus::GdiplusShutdown(m_gdiPlusToken);
 	if(m_hCursor)
 		::DestroyCursor(m_hCursor);
+	if(m_gdiPlusToken)
+		Gdiplus::GdiplusShutdown(m_gdiPlusToken);
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

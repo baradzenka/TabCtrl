@@ -85,7 +85,7 @@ public:
 			// 
 		virtual void OnStartDrag(TabCtrl const * /*ctrl*/, HTAB /*tab*/, CPoint /*ptScr*/) {}   // ptScr - in screen space.
 		virtual void OnDrag(TabCtrl * /*ctrl*/, HTAB /*tab*/, CPoint /*ptScr*/, bool /*outside*/) {}   // ptScr - in screen space, outside==true - dragging out of tabs area.
-		virtual void OnFinishDrag(TabCtrl const * /*ctrl*/, HTAB /*tab*/, bool /*cancel*/) {}   // cancel==false - dragging was finished using left button up.
+		virtual void OnFinishDrag(TabCtrl * /*ctrl*/, HTAB /*tab*/, bool /*cancel*/) {}   // cancel==false - dragging was finished using left button up.
 	}; 
 
 public:

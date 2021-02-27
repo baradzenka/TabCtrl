@@ -7,8 +7,8 @@
 // 
 class TabDialog : public CDialog
 {	DECLARE_MESSAGE_MAP()
-	virtual void OnCancel();
-	virtual void OnOK();
+	void OnCancel() override;
+	void OnOK() override;
 	afx_msg void OnBnClickedButton1();
 };
 /////////////////////////////////////////////////////////////////////////////
@@ -56,9 +56,9 @@ public:
 	DemoDlg();
 
 private: // TabCtrlNotify.
-	virtual void OnCloseButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr);
-	virtual void OnMenuButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr);
-	virtual void OnDrag(TabCtrl *ctrl, TabCtrl::HTAB tab, CPoint ptScr, bool outside);
+	void OnCloseButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr) override;
+	void OnMenuButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr) override;
+	void OnDrag(TabCtrl *ctrl, TabCtrl::HTAB tab, CPoint ptScr, bool outside) override;
 
 private:
 	TabCtrlComplex m_TabCtrl;
@@ -81,7 +81,7 @@ private:
 protected:
 	DECLARE_MESSAGE_MAP()
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnCbnSelchangeCombo1();
 	afx_msg void OnBnClickedBut11();

@@ -4,7 +4,7 @@
 
 // 
 class CApp : public CWinApp
-{	virtual BOOL InitInstance();
+{	BOOL InitInstance() override;
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnAppAbout();

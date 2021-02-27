@@ -9,8 +9,8 @@ class CMainFrame : public CFrameWnd,
 	DECLARE_DYNAMIC(CMainFrame)
 
 private: // TabCtrlNotify.
-	virtual void OnCloseButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr);
-	virtual void OnMenuButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr);
+	void OnCloseButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr) override;
+	void OnMenuButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr) override;
 
 protected:   // control bar embedded members
 	CStatusBar  m_wndStatusBar;
@@ -23,8 +23,8 @@ protected:   // control bar embedded members
 
 protected:
 	DECLARE_MESSAGE_MAP()
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo);
+	BOOL PreCreateWindow(CREATESTRUCT& cs) override;
+	BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra, AFX_CMDHANDLERINFO* pHandlerInfo) override;
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnDestroy();
 	afx_msg void OnSetFocus(CWnd *pOldWnd);
