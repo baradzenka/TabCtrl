@@ -382,7 +382,7 @@ void DemoDlg::OnBnClickedBut53()
 /////////////////////////////////////////////////////////////////////////////
 // Enable / Disable.
 void DemoDlg::OnBnClickedBut61()
-{	HANDLE tab = m_TabCtrl.GetSelectedTab();
+{	TabCtrl::HTAB tab = m_TabCtrl.GetSelectedTab();
 	if(!tab && m_TabCtrl.GetNumberTabs()>0)
 		tab = m_TabCtrl.GetTabHandleByIndex(0);
 	if(tab)
@@ -423,7 +423,7 @@ void DemoDlg::OnBnClickedBut63()
 // 
 // Delete.
 void DemoDlg::OnBnClickedBut64()
-{	HANDLE tab = m_TabCtrl.GetSelectedTab();
+{	TabCtrl::HTAB tab = m_TabCtrl.GetSelectedTab();
 	if(tab)
 	{	m_TabCtrl.DeleteTab(tab);
 		m_TabCtrl.Update();
@@ -473,7 +473,7 @@ void DemoDlg::EnableControl(int id, bool enable) const
 /////////////////////////////////////////////////////////////////////////////
 // 
 void DemoDlg::OnCloseButtonClicked(TabCtrl *ctrl, CRect const * /*rect*/, CPoint /*ptScr*/)
-{	HANDLE tab = ctrl->GetSelectedTab();   // get handle of current active tab (whose child window is visible).
+{	TabCtrl::HTAB tab = ctrl->GetSelectedTab();   // get handle of current active tab (whose child window is visible).
 	if(tab)
 	{	ctrl->DeleteTab(tab);
 		ctrl->Update();
@@ -486,7 +486,7 @@ void DemoDlg::OnMenuButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint /*ptS
 	if( menu.CreatePopupMenu() )
 	{	const int number = ctrl->GetNumberTabs();
 		for(int i=0; i<number; ++i)
-		{	HANDLE tab = ctrl->GetTabHandleByIndex(i);
+		{	TabCtrl::HTAB tab = ctrl->GetTabHandleByIndex(i);
 			const CString text = ctrl->GetTabText(tab);
 				// 
 			MENUITEMINFO info;
@@ -509,7 +509,7 @@ void DemoDlg::OnMenuButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint /*ptS
 		ctrl->ClientToScreen(&rc);
 		const int id = static_cast<int>( ::TrackPopupMenu(menu,TPM_RIGHTALIGN | TPM_RETURNCMD,rc.right,rc.bottom,0,m_hWnd,NULL) );
 		if(id!=0)
-		{	HANDLE selTab = ctrl->GetTabHandleByIndex(id-1);
+		{	TabCtrl::HTAB selTab = ctrl->GetTabHandleByIndex(id-1);
 			ctrl->SelectTab(selTab);
 			ctrl->EnsureTabVisible(selTab);
 			ctrl->Update();
@@ -518,7 +518,7 @@ void DemoDlg::OnMenuButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint /*ptS
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void DemoDlg::OnDrag(TabCtrl *ctrl, HANDLE tab, CPoint /*ptScr*/, bool outside)
+void DemoDlg::OnDrag(TabCtrl *ctrl, TabCtrl::HTAB tab, CPoint /*ptScr*/, bool outside)
 {	if(outside && m_bDelDragOutside)
 	{	ctrl->DeleteTab(tab);
 		ctrl->Update();

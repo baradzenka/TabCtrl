@@ -58,7 +58,7 @@ public:
 private: // TabCtrlNotify.
 	virtual void OnCloseButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr);
 	virtual void OnMenuButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr);
-	virtual void OnDrag(TabCtrl *ctrl, HANDLE tab, CPoint ptScr, bool outside);
+	virtual void OnDrag(TabCtrl *ctrl, TabCtrl::HTAB tab, CPoint ptScr, bool outside);
 
 private:
 	TabCtrlComplex m_TabCtrl;

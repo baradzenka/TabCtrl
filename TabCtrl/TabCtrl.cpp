@@ -68,7 +68,7 @@ struct TabCtrl::Private :
 	private:
 		struct Data : CRITICAL_SECTION
 		{	Data()
-			{	hook = ::SetWindowsHookEx(WH_KEYBOARD,static_cast<HOOKPROC>(HookProc),NULL,::GetCurrentThreadId());
+			{	hook = ::SetWindowsHookEx(WH_KEYBOARD,static_cast<HOOKPROC>(HookProc),nullptr,::GetCurrentThreadId());
 				::InitializeCriticalSection(this);
 			}
 			~Data()
@@ -94,7 +94,7 @@ struct TabCtrl::Private :
 			{
 				Lock();
 					// 
-				std::map<T *,bool(T::*)(UINT,UINT)>::const_iterator i, n;
+				typename std::map<T *,bool(T::*)(UINT,UINT)>::const_iterator i, n;
 				for(i=data->clients.begin(); i!=data->clients.end(); )
 				{	n = i++;
 					if( !(n->first->*n->second)(static_cast<UINT>(wParam),static_cast<UINT>(lParam)) )
@@ -127,7 +127,7 @@ struct TabCtrl::Private :
 	private:
 		struct Data : CRITICAL_SECTION
 		{	Data()
-			{	hook = ::SetWindowsHookEx(WH_CALLWNDPROC,static_cast<HOOKPROC>(HookProc),NULL,::GetCurrentThreadId());
+			{	hook = ::SetWindowsHookEx(WH_CALLWNDPROC,static_cast<HOOKPROC>(HookProc),nullptr,::GetCurrentThreadId());
 				::InitializeCriticalSection(this);
 			}
 			~Data()
@@ -161,7 +161,7 @@ struct TabCtrl::Private :
 		}
 			// 
 		static void CallClient(Data *data, HWND hwnd, bool value)
-		{	std::map<HWND,target_t>::const_iterator i,n,e;
+		{	typename std::map<HWND,target_t>::const_iterator i,n,e;
 			for(i=data->clients.begin(), e=data->clients.end(); i!=e; )
 			{	n = i++;
 					// 
@@ -190,7 +190,7 @@ private:   // TabCtrl::IRecalc.
 	CRect GetTabHorzMargin(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetTabPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	int GetTabImageTextSpace(TabCtrl const *ctrl, IRecalc *base) override;
-	int GetTabExtraWidth(TabCtrl const *ctrl, IRecalc *base, HANDLE tab) override;
+	int GetTabExtraWidth(TabCtrl const *ctrl, IRecalc *base, HTAB tab) override;
 	int GetTabMinWidth(TabCtrl const *ctrl, IRecalc *base) override;
 		// 
 	CRect GetButtonCloseHorzMargin(TabCtrl const *ctrl, IRecalc *base) override;
@@ -199,7 +199,7 @@ private:   // TabCtrl::IRecalc.
 	CRect GetButtonScrollRightHorzMargin(TabCtrl const *ctrl, IRecalc *base) override;
 
 private:   // TabCtrl::IBehavior.
-	HANDLE HitTest(TabCtrl const *ctrl, IBehavior *base, CPoint point) override;
+	HTAB HitTest(TabCtrl const *ctrl, IBehavior *base, CPoint point) override;
 	bool SetCursor(TabCtrl const *ctrl, IBehavior *base) override;
 
 private:
@@ -221,8 +221,8 @@ public:
 		CSize size;
 	} m_ImageSys, m_ImageNormal,m_ImageDisable;
 	COLORREF m_clrImageSysTransp, m_clrImageTransp;
-	HCURSOR m_hCursor;
-	CFont m_FontNormal, m_FontSelect;
+	HCURSOR m_hCursor, *m_phCursorRef;
+	CFont m_FontNormal,*m_pFontNormalRef, m_FontSelect,*m_pFontSelectRef;
 	struct ToolTipText { CString butClose, butMenu, butScrollLeft,butScrollRight; } m_sToolTipText;
 		// 
 	int m_iScrollingStep;
@@ -237,7 +237,7 @@ public:
 	bool m_bWatchActivityCtrl;
 
 public:
-	struct Tab
+	struct Tab : _HTAB
 	{	HWND wnd;
 		int image;
 		CString text, tooltipText;
@@ -252,8 +252,8 @@ public:
 	typedef std::vector<Tab *>::reverse_iterator ri_tabs;
 	typedef std::vector<Tab *>::const_iterator ci_tabs;
 		// 
-	HANDLE m_hCurTab;
-	HANDLE m_hHoverArea, m_hPushedArea;
+	HTAB m_hCurTab;
+	HTAB m_hHoverArea, m_hPushedArea;
 	int m_iTabsOffset, m_iMaxTabsOffset;
 	bool m_bPartialView, m_bScrollLeftAllow,m_bScrollRightAllow;
 		// 
@@ -274,7 +274,7 @@ public:
 	ActivityHook<Private> m_ActivityHook;
 	KeyboardHook<Private> m_KeyboardHook;
 		// 
-	static HANDLE HANDLE_BUT_CLOSE, HANDLE_BUT_MENU, HANDLE_BUT_SCROLLLEFT,HANDLE_BUT_SCROLLRIGHT;
+	static HTAB HANDLE_BUT_CLOSE, HANDLE_BUT_MENU, HANDLE_BUT_SCROLLLEFT,HANDLE_BUT_SCROLLRIGHT;
 	enum { TimerIdScrollLeftClick=1, TimerIdScrollLeftScrolling, TimerIdScrollRightClick, TimerIdScrollRightScrolling };
 
 public:
@@ -282,20 +282,20 @@ public:
 	bool OnKeyDown(UINT keyCode, UINT msgFlag);   // callback from KeyboardHook.
 
 public:
-	Tab *HandleToTab(HANDLE h) { return static_cast<Tab *>(h); }
-	Tab const *HandleToTab(HANDLE h) const { return static_cast<Tab const *>(h); }
-	HANDLE InsertTab(i_tabs before, HWND wnd, TCHAR const *text, int image);
+	Tab *HandleToTab(HTAB h) { return const_cast<Tab *>( static_cast<Tab const *>(h) ); }
+	Tab const *HandleToTab(HTAB h) const { return static_cast<Tab const *>(h); }
+	HTAB InsertTab(i_tabs before, HWND wnd, TCHAR const *text, int image);
 	void Recalc(bool redraw);   // recalculate control.
 	int GetFullTabsWidth();
 	void RecalcScale(int visibleTabsWidth, int fullTabsWidth);
 	void RecalcScroll();
 	void CalcTabsWidth();
-	int CalcTabWidth(HANDLE tab);
+	int CalcTabWidth(HTAB tab);
 	void UpdateToolTips();
-	HANDLE GetTabWithWindowID(int id, HANDLE exceptTab) const;   // get tab whose window has 'id' except 'exceptTab'.
-	bool GetTabAndIndex(int id, HANDLE *tab/*out*/, int *idx/*out*/) const;
+	HTAB GetTabWithWindowID(int id, HTAB exceptTab) const;   // get tab whose window has 'id' except 'exceptTab'.
+	bool GetTabAndIndex(int id, HTAB *tab/*out*/, int *idx/*out*/) const;
 	void LButtonDown(CPoint point);
-	bool IsSystemButton(HANDLE tab) const;
+	bool IsSystemButton(HTAB tab) const;
 	void StepLeft();
 	void StepRight();
 	void StopScrolling();
@@ -312,10 +312,10 @@ public:
 };
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
-HANDLE TabCtrl::Private::HANDLE_BUT_CLOSE = reinterpret_cast<HANDLE>(1);
-HANDLE TabCtrl::Private::HANDLE_BUT_MENU = reinterpret_cast<HANDLE>(2);
-HANDLE TabCtrl::Private::HANDLE_BUT_SCROLLLEFT = reinterpret_cast<HANDLE>(3);
-HANDLE TabCtrl::Private::HANDLE_BUT_SCROLLRIGHT = reinterpret_cast<HANDLE>(4);
+TabCtrl::HTAB TabCtrl::Private::HANDLE_BUT_CLOSE = reinterpret_cast<HTAB>(1);
+TabCtrl::HTAB TabCtrl::Private::HANDLE_BUT_MENU = reinterpret_cast<HTAB>(2);
+TabCtrl::HTAB TabCtrl::Private::HANDLE_BUT_SCROLLLEFT = reinterpret_cast<HTAB>(3);
+TabCtrl::HTAB TabCtrl::Private::HANDLE_BUT_SCROLLRIGHT = reinterpret_cast<HTAB>(4);
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 IMPLEMENT_DYNCREATE(TabCtrl,CWnd)
@@ -350,20 +350,22 @@ TabCtrl::~TabCtrl()
 /////////////////////////////////////////////////////////////////////////////
 // 
 TabCtrl::Private::Private(TabCtrl &owner) : o(owner)
-{	m_pDrawManager = NULL;
+{	m_pDrawManager = nullptr;
 	m_pRecalcManager = this;
 	m_pBehaviorManager = this;
-	m_pToolTipManager = NULL;
+	m_pToolTipManager = nullptr;
 	m_pAbilityManager = this;
-	m_pNotifyManager = NULL;
+	m_pNotifyManager = nullptr;
 		// 
 	m_Layout = LayoutTop;
 	m_Behavior = BehaviorScale;
 		// 
-	m_ImageSys.bmp = m_ImageNormal.bmp = m_ImageDisable.bmp = NULL;
+	m_ImageSys.bmp = m_ImageNormal.bmp = m_ImageDisable.bmp = nullptr;
 	m_ImageSys.size.SetSize(0,0);
 	m_ImageNormal.size = m_ImageDisable.size = m_ImageSys.size;
-	m_hCursor = NULL;
+	m_hCursor = nullptr;
+	m_phCursorRef = nullptr;
+	m_pFontNormalRef = m_pFontSelectRef = nullptr;
 		// 
 	m_iScrollingStep = 15;
 	m_bShowBorder = true;
@@ -378,7 +380,7 @@ TabCtrl::Private::Private(TabCtrl &owner) : o(owner)
 		// 
 	m_gdiPlusToken = 0;
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-	Gdiplus::GdiplusStartup(&m_gdiPlusToken/*out*/,&gdiplusStartupInput,NULL);
+	Gdiplus::GdiplusStartup(&m_gdiPlusToken/*out*/,&gdiplusStartupInput,nullptr);
 }
 //
 TabCtrl::Private::~Private()
@@ -398,25 +400,25 @@ BOOL TabCtrl::Create(LPCTSTR /*lpszClassName*/, LPCTSTR /*lpszWindowName*/, DWOR
 }
 // 
 bool TabCtrl::Create(CWnd *parent, DWORD style, RECT const &rect, UINT id)
-{	p.m_hCurTab = NULL;
-	p.m_hHoverArea = NULL;
-	p.m_hPushedArea = NULL;
+{	p.m_hCurTab = nullptr;
+	p.m_hHoverArea = nullptr;
+	p.m_hPushedArea = nullptr;
 	p.m_iTabsOffset = 0;
 	p.m_bPartialView = p.m_bScrollLeftAllow = p.m_bScrollRightAllow = false;
 	p.m_TabDrag.active = false;
 	p.m_bActive = false;
 		// 
-	p.m_pToolTip = NULL;
-	p.m_pLifeStatus = NULL;
+	p.m_pToolTip = nullptr;
+	p.m_pLifeStatus = nullptr;
 		// 
-	const CString classname = AfxRegisterWndClass(CS_DBLCLKS,::LoadCursor(NULL,IDC_ARROW),NULL,NULL);
+	const CString classname = AfxRegisterWndClass(CS_DBLCLKS,::LoadCursor(nullptr,IDC_ARROW),nullptr,nullptr);
 	if(CWnd::Create(classname,_T(""),style | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,rect,parent,id)==FALSE)
 		return false;
 		// 
 	CFont *font = CFont::FromHandle( static_cast<HFONT>(::GetStockObject(DEFAULT_GUI_FONT)) );
-	if( !GetFontNormal()->m_hObject )
+	if( !GetFontNormal() )
 		SetFontNormal(font);
-	if( !GetFontSelect()->m_hObject )
+	if( !GetFontSelect() )
 		SetFontSelect(font);
 		// 
 	if( p.m_sToolTipText.butClose.IsEmpty() )
@@ -480,23 +482,23 @@ bool TabCtrl::IsActive() const
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-HANDLE TabCtrl::AddTab(HWND wnd, TCHAR const *text, int image)
+TabCtrl::HTAB TabCtrl::AddTab(HWND wnd, TCHAR const *text, int image)
 {	return p.InsertTab(p.m_tabs.end(),wnd,text,image);
 }
 // 
-HANDLE TabCtrl::InsertTab(HANDLE before, HWND wnd, TCHAR const *text, int image)
+TabCtrl::HTAB TabCtrl::InsertTab(HTAB before, HWND wnd, TCHAR const *text, int image)
 {	assert( IsTabExist(before) );
 		// 
 	Private::i_tabs bef = p.m_tabs.begin() + GetTabIndexByHandle(before);
 	return p.InsertTab(bef,wnd,text,image);
 }
 // 
-HANDLE TabCtrl::Private::InsertTab(i_tabs before, HWND wnd, TCHAR const *text, int image)
+TabCtrl::HTAB TabCtrl::Private::InsertTab(i_tabs before, HWND wnd, TCHAR const *text, int image)
 {	assert(wnd && ::IsWindow(wnd) && ::GetParent(wnd)==o.m_hWnd);
 	assert(text);
 	assert(image>=-1);
 	assert( ::GetDlgCtrlID(wnd) );   // ID==0 - this is error.
-	assert(o.GetTabWithWindowID(::GetDlgCtrlID(wnd))==NULL);   // window with this ID has inserted.
+	assert(o.GetTabWithWindowID(::GetDlgCtrlID(wnd))==nullptr);   // window with this ID has inserted.
 		// 
 	Tab *tab = new (std::nothrow) Tab;
 	tab->wnd = wnd;
@@ -522,7 +524,7 @@ HANDLE TabCtrl::Private::InsertTab(i_tabs before, HWND wnd, TCHAR const *text, i
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrl::RemoveTabBefore(HANDLE before, HANDLE src)
+void TabCtrl::RemoveTabBefore(HTAB before, HTAB src)
 {	assert(IsTabExist(before) && IsTabExist(src));
 		// 
 	if(before!=src)
@@ -537,7 +539,7 @@ void TabCtrl::RemoveTabBefore(HANDLE before, HANDLE src)
 	}
 }
 // 
-void TabCtrl::RemoveTabAfter(HANDLE after, HANDLE src)
+void TabCtrl::RemoveTabAfter(HTAB after, HTAB src)
 {	assert(IsTabExist(after) && IsTabExist(src));
 		// 
 	if(after!=src)
@@ -553,7 +555,7 @@ void TabCtrl::RemoveTabAfter(HANDLE after, HANDLE src)
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrl::DeleteTab(HANDLE tab)
+void TabCtrl::DeleteTab(HTAB tab)
 {	assert( IsTabExist(tab) );
 		// 
 	if(tab==p.m_hPushedArea)
@@ -561,7 +563,7 @@ void TabCtrl::DeleteTab(HANDLE tab)
 		p.StopTabDragging(true);
 	}
 	if(tab==p.m_hHoverArea)
-		p.m_hHoverArea = NULL;
+		p.m_hHoverArea = nullptr;
 		// 
 	if(p.m_hCurTab==tab)
 	{	p.m_hCurTab = GetNextEnableTab(tab);
@@ -602,7 +604,7 @@ void TabCtrl::DeleteAllTabs()
 	p.m_tabs.clear();
 	p.StopScrolling();
 	p.StopTabDragging(true);
-	p.m_hHoverArea = p.m_hPushedArea = p.m_hCurTab = NULL;
+	p.m_hHoverArea = p.m_hPushedArea = p.m_hCurTab = nullptr;
 	p.m_iTabsOffset = 0;
 	p.m_bPartialView = p.m_bScrollLeftAllow = p.m_bScrollRightAllow = false;
 }
@@ -640,7 +642,7 @@ void TabCtrl::SetToolTipManager(ToolTip *ptr/*or null*/)
 {	if(ptr!=p.m_pToolTipManager)
 	{	if(p.m_pToolTipManager && p.m_pToolTip) 
 			p.m_pToolTipManager->DestroyToolTip(p.m_pToolTip);
-		p.m_pToolTip = NULL;
+		p.m_pToolTip = nullptr;
 		p.m_pToolTipManager = ptr;
 	}
 }
@@ -691,7 +693,7 @@ TabCtrl::Behavior TabCtrl::GetBehavior() const
 bool TabCtrl::CreateSystemImage(HMODULE moduleRes/*or null*/, UINT resID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
 {	if(p.m_ImageSys.bmp)
 	{	::delete p.m_ImageSys.bmp;
-		p.m_ImageSys.bmp = NULL;
+		p.m_ImageSys.bmp = nullptr;
 	}
 		// 
 	bool res = true;
@@ -730,11 +732,11 @@ COLORREF TabCtrl::GetSystemImageTranspColor() const
 bool TabCtrl::CreateImage(HMODULE moduleRes/*or null*/, UINT resNormalID/*or 0*/, UINT resDisableID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
 {	if(p.m_ImageNormal.bmp)
 	{	::delete p.m_ImageNormal.bmp;
-		p.m_ImageNormal.bmp = NULL;
+		p.m_ImageNormal.bmp = nullptr;
 	}
 	if(p.m_ImageDisable.bmp)
 	{	::delete p.m_ImageDisable.bmp;
-		p.m_ImageDisable.bmp = NULL;
+		p.m_ImageDisable.bmp = nullptr;
 	}
 		// 
 	bool res = true;
@@ -791,14 +793,15 @@ COLORREF TabCtrl::GetImageTranspColor() const
 /////////////////////////////////////////////////////////////////////////////
 // 
 bool TabCtrl::SetCursor(UINT resID)
-{	return SetCursor(NULL,resID);
+{	return SetCursor(nullptr,resID);
 }
 // 
 bool TabCtrl::SetCursor(HMODULE module, UINT resID)
 {	if(p.m_hCursor)
 	{	::DestroyCursor(p.m_hCursor);
-		p.m_hCursor = NULL;
+		p.m_hCursor = nullptr;
 	}
+	p.m_phCursorRef = nullptr;
 		// 
 	if(resID)
 	{	if(!module)
@@ -806,7 +809,9 @@ bool TabCtrl::SetCursor(HMODULE module, UINT resID)
 		if(!module)
 			return false;
 		p.m_hCursor = ::LoadCursor(module,MAKEINTRESOURCE(resID));
-		return p.m_hCursor!=NULL;
+		if(!p.m_hCursor)
+			return false;
+		p.m_phCursorRef = &p.m_hCursor;
 	}
 	return true;
 }
@@ -814,18 +819,29 @@ bool TabCtrl::SetCursor(HMODULE module, UINT resID)
 bool TabCtrl::SetCursor(HCURSOR cursor)
 {	if(p.m_hCursor)
 	{	::DestroyCursor(p.m_hCursor);
-		p.m_hCursor = NULL;
+		p.m_hCursor = nullptr;
 	}
+	p.m_phCursorRef = nullptr;
 		// 
 	if(cursor)
 	{	p.m_hCursor = static_cast<HCURSOR>( CopyImage(cursor,IMAGE_CURSOR,0,0,0) );
-		return p.m_hCursor!=NULL;
+		if(!p.m_hCursor)
+			return false;
+		p.m_phCursorRef = &p.m_hCursor;
 	}
 	return true;
 }
+//
+void TabCtrl::SetCursorRef(HCURSOR *phCursor)
+{	if(p.m_hCursor)
+	{	::DestroyCursor(p.m_hCursor);
+		p.m_hCursor = nullptr;
+	}
+	p.m_phCursorRef = phCursor;
+}
 // 
 HCURSOR TabCtrl::GetCursor() const
-{	return p.m_hCursor;
+{	return (p.m_phCursorRef ? *p.m_phCursorRef : nullptr);
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -840,53 +856,53 @@ bool TabCtrl::IsBorderVisible() const
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrl::SetTabText(HANDLE tab, TCHAR const *text)
+void TabCtrl::SetTabText(HTAB tab, TCHAR const *text)
 {	assert( IsTabExist(tab) );
 	assert(text);
 		// 
 	p.HandleToTab(tab)->text = text;
 }
 // 
-CString TabCtrl::GetTabText(HANDLE tab) const
+CString TabCtrl::GetTabText(HTAB tab) const
 {	assert( IsTabExist(tab) );
 		// 
 	return p.HandleToTab(tab)->text;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrl::SetTabImage(HANDLE tab, int image)
+void TabCtrl::SetTabImage(HTAB tab, int image)
 {	assert( IsTabExist(tab) );
 	assert(image>=-1);
 	p.HandleToTab(tab)->image = image;
 }
 // 
-int TabCtrl::GetTabImage(HANDLE tab) const
+int TabCtrl::GetTabImage(HTAB tab) const
 {	assert( IsTabExist(tab) );
 	return p.HandleToTab(tab)->image;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrl::SetTabWindow(HANDLE tab, HWND wnd)
+void TabCtrl::SetTabWindow(HTAB tab, HWND wnd)
 {	assert( IsTabExist(tab) );
 	assert(wnd && ::IsWindow(wnd) && ::GetParent(wnd)==m_hWnd);
 	assert( ::GetDlgCtrlID(wnd) );
-	assert(p.GetTabWithWindowID(::GetDlgCtrlID(wnd),tab)==NULL);   // window with this ID has inserted.
+	assert(p.GetTabWithWindowID(::GetDlgCtrlID(wnd),tab)==nullptr);   // window with this ID has inserted.
 		// 
 	p.HandleToTab(tab)->wnd = wnd;
 }
 // 
-HWND TabCtrl::GetTabWindow(HANDLE tab) const
+HWND TabCtrl::GetTabWindow(HTAB tab) const
 {	assert( IsTabExist(tab) );
 	return p.HandleToTab(tab)->wnd;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrl::SetTabData(HANDLE tab, __int64 data)
+void TabCtrl::SetTabData(HTAB tab, __int64 data)
 {	assert( IsTabExist(tab) );
 	p.HandleToTab(tab)->data = data;
 }
 // 
-__int64 TabCtrl::GetTabData(HANDLE tab) const
+__int64 TabCtrl::GetTabData(HTAB tab) const
 {	assert( IsTabExist(tab) );
 	return p.HandleToTab(tab)->data;
 }
@@ -894,7 +910,7 @@ __int64 TabCtrl::GetTabData(HANDLE tab) const
 /////////////////////////////////////////////////////////////////////////////
 // copy: text, image, data, tooltip text and disable/enable state.
 // 
-void TabCtrl::CopyTabContent(HANDLE dst, TabCtrl const *tabCtrlSrc, HANDLE src)
+void TabCtrl::CopyTabContent(HTAB dst, TabCtrl const *tabCtrlSrc, HTAB src)
 {	assert( IsTabExist(dst) );
 	assert(tabCtrlSrc && tabCtrlSrc->IsTabExist(src));
 		// 
@@ -911,14 +927,14 @@ void TabCtrl::CopyTabContent(HANDLE dst, TabCtrl const *tabCtrlSrc, HANDLE src)
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrl::SetTabTooltipText(HANDLE tab, TCHAR const *text)
+void TabCtrl::SetTabTooltipText(HTAB tab, TCHAR const *text)
 {	assert( IsTabExist(tab) );
 	assert(text);
 		// 
 	p.HandleToTab(tab)->tooltipText = text;
 }
 // 
-CString TabCtrl::GetTabTooltipText(HANDLE tab) const
+CString TabCtrl::GetTabTooltipText(HTAB tab) const
 {	assert( IsTabExist(tab) );
 		// 
 	return p.HandleToTab(tab)->tooltipText;
@@ -1004,16 +1020,16 @@ void TabCtrl::Private::Recalc(bool redraw)
 			// 
 			// 
 		if(m_hCurTab && !o.IsTabExist(m_hCurTab))
-			m_hCurTab=NULL;
+			m_hCurTab=nullptr;
 			// 
-		HANDLE hOldCurTab = m_hCurTab;
+		HTAB hOldCurTab = m_hCurTab;
 			// 
-		if(m_hCurTab==NULL)
+		if(m_hCurTab==nullptr)
 			m_hCurTab = o.GetFirstEnableTab();
 		else
 			if( HandleToTab(m_hCurTab)->disable )
-			{	HANDLE hCurTab = o.GetNextEnableTab(m_hCurTab);
-				if(hCurTab==NULL)
+			{	HTAB hCurTab = o.GetNextEnableTab(m_hCurTab);
+				if(hCurTab==nullptr)
 					hCurTab = o.GetPrevEnableTab(m_hCurTab);
 				m_hCurTab = hCurTab;
 			}
@@ -1121,7 +1137,7 @@ void TabCtrl::Private::Recalc(bool redraw)
 				if( ::IsWindow(HandleToTab(m_hCurTab)->wnd) )
 					::ShowWindow(HandleToTab(m_hCurTab)->wnd,SW_HIDE);
 				// 
-			m_hCurTab = (!tab->disable ? tab : NULL);
+			m_hCurTab = (!tab->disable ? tab : nullptr);
 				// 
 			if(m_hCurTab)
 			{	CRect rcWindows(m_rcWindows);
@@ -1265,7 +1281,7 @@ int TabCtrl::CalcCtrlAreaHeight()
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-int TabCtrl::Private::CalcTabWidth(HANDLE tab)
+int TabCtrl::Private::CalcTabWidth(HTAB tab)
 {	_ASSERT( o.IsTabExist(tab) );
 		// 
 	int imageWidth = 0;
@@ -1359,12 +1375,12 @@ void TabCtrl::OnPaint()
 			// 
 		if( p.m_pDrawManager->IsDrawTabsStraightOrder(this) )   // left to right.
 		{	for(Private::i_tabs i=p.m_tabs.begin(), e=p.m_tabs.end(); i!=e; ++i)
-				if(*i!=p.m_hCurTab && IsTabVisible(*i,NULL))
+				if(*i!=p.m_hCurTab && IsTabVisible(*i,nullptr))
 					p.m_pDrawManager->DrawTab(this,&virtwnd,*i,&rgn);
 		}
 		else	// right to left.
 			for(Private::ri_tabs i=p.m_tabs.rbegin(), e=p.m_tabs.rend(); i!=e; ++i)
-				if(*i!=p.m_hCurTab && IsTabVisible(*i,NULL))
+				if(*i!=p.m_hCurTab && IsTabVisible(*i,nullptr))
 					p.m_pDrawManager->DrawTab(this,&virtwnd,*i,&rgn);
 			// 
 		if(p.m_hCurTab)
@@ -1376,27 +1392,27 @@ void TabCtrl::OnPaint()
 			else
 				p.m_pDrawManager->DrawTab(this,&virtwnd,p.m_hCurTab,&rgn);
 			// 
-		virtwnd.SelectClipRgn(NULL,RGN_COPY);
+		virtwnd.SelectClipRgn(nullptr,RGN_COPY);
 		virtwnd.SelectObject(pOldFont);
 			// 
 		if( !p.m_rcButtonScrollLeft.IsRectEmpty() )
-		{	bool hover = p.m_hHoverArea==Private::HANDLE_BUT_SCROLLLEFT && (p.m_hPushedArea==NULL || p.m_hPushedArea==Private::HANDLE_BUT_SCROLLLEFT);
+		{	bool hover = p.m_hHoverArea==Private::HANDLE_BUT_SCROLLLEFT && (p.m_hPushedArea==nullptr || p.m_hPushedArea==Private::HANDLE_BUT_SCROLLLEFT);
 			p.m_pDrawManager->DrawButtonScrollLeft(this,&virtwnd,&p.m_rcButtonScrollLeft,hover,p.m_hPushedArea==Private::HANDLE_BUT_SCROLLLEFT,p.m_bScrollLeftAllow);
-			hover = p.m_hHoverArea==Private::HANDLE_BUT_SCROLLRIGHT && (p.m_hPushedArea==NULL || p.m_hPushedArea==Private::HANDLE_BUT_SCROLLRIGHT);
+			hover = p.m_hHoverArea==Private::HANDLE_BUT_SCROLLRIGHT && (p.m_hPushedArea==nullptr || p.m_hPushedArea==Private::HANDLE_BUT_SCROLLRIGHT);
 			p.m_pDrawManager->DrawButtonScrollRight(this,&virtwnd,&p.m_rcButtonScrollRight,hover,p.m_hPushedArea==Private::HANDLE_BUT_SCROLLRIGHT,p.m_bScrollRightAllow);
 		}
 		if( !p.m_rcButtonMenu.IsRectEmpty() )
-		{	const bool hover = p.m_hHoverArea==Private::HANDLE_BUT_MENU && (p.m_hPushedArea==NULL || p.m_hPushedArea==Private::HANDLE_BUT_MENU);
+		{	const bool hover = p.m_hHoverArea==Private::HANDLE_BUT_MENU && (p.m_hPushedArea==nullptr || p.m_hPushedArea==Private::HANDLE_BUT_MENU);
 			p.m_pDrawManager->DrawButtonMenu(this,&virtwnd,&p.m_rcButtonMenu,hover,p.m_hPushedArea==Private::HANDLE_BUT_MENU,p.m_bPartialView);
 		}
 		if( !p.m_rcButtonClose.IsRectEmpty() )
-		{	const bool hover = p.m_hHoverArea==Private::HANDLE_BUT_CLOSE && (p.m_hPushedArea==NULL || p.m_hPushedArea==Private::HANDLE_BUT_CLOSE);
+		{	const bool hover = p.m_hHoverArea==Private::HANDLE_BUT_CLOSE && (p.m_hPushedArea==nullptr || p.m_hPushedArea==Private::HANDLE_BUT_CLOSE);
 			p.m_pDrawManager->DrawButtonClose(this,&virtwnd,&p.m_rcButtonClose,hover,p.m_hPushedArea==Private::HANDLE_BUT_CLOSE);
 		}
 	}
 		// 
 	const CRect rcWndsAreaPadding = GetWindowsAreaPadding();
-	if(p.m_tabs.empty() || p.m_hCurTab==NULL || !rcWndsAreaPadding.IsRectNull())
+	if(p.m_tabs.empty() || p.m_hCurTab==nullptr || !rcWndsAreaPadding.IsRectNull())
 		p.m_pDrawManager->DrawWindowsAreaBack(this,&virtwnd,&p.m_rcWindows);
 		// 
 	if(p.m_bShowBorder)
@@ -1482,17 +1498,29 @@ bool TabCtrl::SetFontNormal(CFont *font)
 	font->GetLogFont(&logfont/*out*/);
 	return SetFontNormal(&logfont);
 }
+//
+void TabCtrl::SetFontNormalRef(CFont *font)
+{	assert(font && font->m_hObject);
+		// 
+	if(p.m_FontNormal.m_hObject)
+		p.m_FontNormal.DeleteObject();
+	p.m_pFontNormalRef = font;
+}
 // 
 bool TabCtrl::SetFontNormal(LOGFONT const *lf)
 {	assert(lf);
 		// 
 	if(p.m_FontNormal.m_hObject)
 		p.m_FontNormal.DeleteObject();
-	return p.m_FontNormal.CreateFontIndirect(lf)!=0;
+	p.m_pFontNormalRef = nullptr;
+	if( !p.m_FontNormal.CreateFontIndirect(lf) )
+		return false;
+	p.m_pFontNormalRef = &p.m_FontNormal;
+	return true;
 }
 // 
 CFont *TabCtrl::GetFontNormal()
-{	return &p.m_FontNormal;
+{	return p.m_pFontNormalRef;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
@@ -1503,17 +1531,29 @@ bool TabCtrl::SetFontSelect(CFont *font)
 	font->GetLogFont(&logfont/*out*/);
 	return SetFontSelect(&logfont);
 }
+//
+void TabCtrl::SetFontSelectRef(CFont *font)
+{	assert(font && font->m_hObject);
+		// 
+	if(p.m_FontSelect.m_hObject)
+		p.m_FontSelect.DeleteObject();
+	p.m_pFontSelectRef = font;
+}
 // 
 bool TabCtrl::SetFontSelect(LOGFONT const *lf)
 {	assert(lf);
 		// 
 	if(p.m_FontSelect.m_hObject)
 		p.m_FontSelect.DeleteObject();
-	return p.m_FontSelect.CreateFontIndirect(lf)!=0;
+	p.m_pFontSelectRef = nullptr;
+	if( !p.m_FontSelect.CreateFontIndirect(lf) )
+		return false;
+	p.m_pFontSelectRef = &p.m_FontSelect;
+	return true;
 }
 // 
 CFont *TabCtrl::GetFontSelect()
-{	return &p.m_FontSelect;
+{	return p.m_pFontSelectRef;
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -1523,37 +1563,37 @@ int TabCtrl::GetNumberTabs() const
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-HANDLE TabCtrl::GetTabHandleByIndex(int idx) const
+TabCtrl::HTAB TabCtrl::GetTabHandleByIndex(int idx) const
 {	assert(idx>=0 && idx<GetNumberTabs());
 	return p.m_tabs[idx];
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-HANDLE TabCtrl::GetFirstEnableTab() const
+TabCtrl::HTAB TabCtrl::GetFirstEnableTab() const
 {	for(Private::ci_tabs i=p.m_tabs.begin(), e=p.m_tabs.end(); i!=e; ++i)
 		if(!(*i)->disable)
 			return *i;
-	return NULL;
+	return nullptr;
 }
 // 
-HANDLE TabCtrl::GetPrevEnableTab(HANDLE tab) const
+TabCtrl::HTAB TabCtrl::GetPrevEnableTab(HTAB tab) const
 {	for(Private::ci_tabs i=p.m_tabs.begin()+GetTabIndexByHandle(tab); i!=p.m_tabs.begin(); )
 		if(!(*--i)->disable)
 			return *i;
-	return NULL;
+	return nullptr;
 }
 // 
-HANDLE TabCtrl::GetNextEnableTab(HANDLE tab) const
+TabCtrl::HTAB TabCtrl::GetNextEnableTab(HTAB tab) const
 {	for(Private::ci_tabs i=p.m_tabs.begin()+GetTabIndexByHandle(tab)+1, e=p.m_tabs.end(); i!=e; ++i)
 		if(!(*i)->disable)
 			return *i;
-	return NULL;
+	return nullptr;
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrl::SelectTab(HANDLE tab)
+void TabCtrl::SelectTab(HTAB tab)
 {	assert( IsTabExist(tab) );
 		// 
 	if(p.m_hCurTab==tab || p.HandleToTab(tab)->disable)
@@ -1569,34 +1609,34 @@ void TabCtrl::SelectTab(HANDLE tab)
 	p.m_hCurTab = tab;
 }
 // 
-HANDLE TabCtrl::GetSelectedTab() const
+TabCtrl::HTAB TabCtrl::GetSelectedTab() const
 {	return p.m_hCurTab;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-HANDLE TabCtrl::GetTabUnderCursor() const
-{	return (p.m_hHoverArea && !p.IsSystemButton(p.m_hHoverArea) ? p.m_hHoverArea : NULL);
+TabCtrl::HTAB TabCtrl::GetTabUnderCursor() const
+{	return (p.m_hHoverArea && !p.IsSystemButton(p.m_hHoverArea) ? p.m_hHoverArea : nullptr);
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-HANDLE TabCtrl::GetPushedTab() const
-{	return (p.m_hPushedArea && !p.IsSystemButton(p.m_hPushedArea) ? p.m_hPushedArea : NULL);
+TabCtrl::HTAB TabCtrl::GetPushedTab() const
+{	return (p.m_hPushedArea && !p.IsSystemButton(p.m_hPushedArea) ? p.m_hPushedArea : nullptr);
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrl::DisableTab(HANDLE tab, bool disable)
+void TabCtrl::DisableTab(HTAB tab, bool disable)
 {	assert( IsTabExist(tab) );
 	p.HandleToTab(tab)->disable = disable;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-bool TabCtrl::IsTabDisabled(HANDLE tab) const
+bool TabCtrl::IsTabDisabled(HTAB tab) const
 {	assert( IsTabExist(tab) );
 	return p.HandleToTab(tab)->disable;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrl::EnsureTabVisible(HANDLE tab)
+void TabCtrl::EnsureTabVisible(HTAB tab)
 {	if(p.m_Behavior==BehaviorScroll)
 	{	Private::Tab *i = p.HandleToTab(tab);
 			// 
@@ -1631,12 +1671,12 @@ int TabCtrl::GetTabsScrollingStep() const
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-HANDLE TabCtrl::HitTest(CPoint point) const
+TabCtrl::HTAB TabCtrl::HitTest(CPoint point) const
 {	return p.m_pBehaviorManager->HitTest(const_cast<TabCtrl*>(this),&p,point);
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-int TabCtrl::GetTabIndexByHandle(HANDLE tab) const
+int TabCtrl::GetTabIndexByHandle(HTAB tab) const
 {	for(Private::ci_tabs i=p.m_tabs.begin(), e=p.m_tabs.end(); i!=e; ++i)
 		if(*i==p.HandleToTab(tab))
 			return static_cast<int>(i-p.m_tabs.begin());
@@ -1644,19 +1684,19 @@ int TabCtrl::GetTabIndexByHandle(HANDLE tab) const
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-bool TabCtrl::IsTabExist(HANDLE tab) const
+bool TabCtrl::IsTabExist(HTAB tab) const
 {	return GetTabIndexByHandle(tab)!=-1;
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-RECT TabCtrl::GetTabRect(HANDLE tab) const
+RECT TabCtrl::GetTabRect(HTAB tab) const
 {	assert( IsTabExist(tab) );
 	return p.HandleToTab(tab)->rect;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-bool TabCtrl::IsTabVisible(HANDLE tab, bool *partially/*out,or null*/) const
+bool TabCtrl::IsTabVisible(HTAB tab, bool *partially/*out,or null*/) const
 {	assert( IsTabExist(tab) );
 		// 
 	CRect const &rc = p.HandleToTab(tab)->rect;
@@ -1674,19 +1714,19 @@ bool TabCtrl::IsTabVisible(HANDLE tab, bool *partially/*out,or null*/) const
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-HANDLE TabCtrl::GetTabWithWindowID(int id) const
-{	return p.GetTabWithWindowID(id,NULL);
+TabCtrl::HTAB TabCtrl::GetTabWithWindowID(int id) const
+{	return p.GetTabWithWindowID(id,nullptr);
 }
 // 
-HANDLE TabCtrl::Private::GetTabWithWindowID(int id, HANDLE exceptTab) const
+TabCtrl::HTAB TabCtrl::Private::GetTabWithWindowID(int id, HTAB exceptTab) const
 {	for(ci_tabs i=m_tabs.begin(), e=m_tabs.end(); i!=e; ++i)
 		if(*i!=exceptTab && ::GetDlgCtrlID((*i)->wnd)==id)
 			return *i;
-	return NULL;
+	return nullptr;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-bool TabCtrl::Private::GetTabAndIndex(int id, HANDLE *tab/*out*/, int *idx/*out*/) const
+bool TabCtrl::Private::GetTabAndIndex(int id, HTAB *tab/*out*/, int *idx/*out*/) const
 {	for(ci_tabs i=m_tabs.begin(), e=m_tabs.end(); i!=e; ++i)
 		if(::GetDlgCtrlID((*i)->wnd)==id)
 		{	if(tab)
@@ -1699,7 +1739,7 @@ bool TabCtrl::Private::GetTabAndIndex(int id, HANDLE *tab/*out*/, int *idx/*out*
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-int TabCtrl::CompareTabsPosition(HANDLE hTab1, HANDLE hTab2) const
+int TabCtrl::CompareTabsPosition(HTAB hTab1, HTAB hTab2) const
 {	assert(IsTabExist(hTab1) && IsTabExist(hTab2));
 		// 
 	if(hTab1==hTab2)
@@ -1740,7 +1780,7 @@ int TabCtrl::Private::GetTabImageTextSpace(TabCtrl const * /*ctrl*/, IRecalc * /
 {	return 3;
 }
 // 
-int TabCtrl::Private::GetTabExtraWidth(TabCtrl const * /*ctrl*/, IRecalc * /*base*/, HANDLE /*tab*/)
+int TabCtrl::Private::GetTabExtraWidth(TabCtrl const * /*ctrl*/, IRecalc * /*base*/, HTAB /*tab*/)
 {	return 0;
 }
 // 
@@ -1768,15 +1808,15 @@ CRect TabCtrl::Private::GetButtonScrollRightHorzMargin(TabCtrl const * /*ctrl*/,
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-HANDLE TabCtrl::Private::HitTest(TabCtrl const *ctrl, IBehavior * /*base*/, CPoint point)   // get tab in the given point.
+TabCtrl::HTAB TabCtrl::Private::HitTest(TabCtrl const *ctrl, IBehavior * /*base*/, CPoint point)   // get tab in the given point.
 {	if( CRect(ctrl->GetTabsArea()).PtInRect(point) )
 		for(int i=0, c=ctrl->GetNumberTabs(); i<c; ++i)
-		{	HANDLE tab = ctrl->GetTabHandleByIndex(i);
+		{	HTAB tab = ctrl->GetTabHandleByIndex(i);
 			const CRect rc = ctrl->GetTabRect(tab);
 			if( rc.PtInRect(point) )
 				return tab;
 		}
-	return NULL;
+	return nullptr;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
@@ -1813,7 +1853,7 @@ CRect TabCtrl::GetWindowsAreaPadding() const { return p.m_pRecalcManager->GetWin
 CRect TabCtrl::GetTabHorzMargin() const { return p.m_pRecalcManager->GetTabHorzMargin(this,&p); }
 CRect TabCtrl::GetTabPadding() const { return p.m_pRecalcManager->GetTabPadding(this,&p); }
 int TabCtrl::GetTabImageTextSpace() const { return p.m_pRecalcManager->GetTabImageTextSpace(this,&p); }
-int TabCtrl::GetTabExtraWidth(HANDLE tab) const { return p.m_pRecalcManager->GetTabExtraWidth(this,&p,tab); }
+int TabCtrl::GetTabExtraWidth(HTAB tab) const { return p.m_pRecalcManager->GetTabExtraWidth(this,&p,tab); }
 int TabCtrl::GetTabMinWidth() const { return p.m_pRecalcManager->GetTabMinWidth(this,&p); }
 CRect TabCtrl::GetButtonCloseHorzMargin() const { return p.m_pRecalcManager->GetButtonCloseHorzMargin(this,&p); }
 CRect TabCtrl::GetButtonMenuHorzMargin() const { return p.m_pRecalcManager->GetButtonMenuHorzMargin(this,&p); }
@@ -1881,8 +1921,8 @@ void TabCtrl::OnMouseMove(UINT nFlags, CPoint point)
 /////////////////////////////////////////////////////////////////////////////
 // 
 void TabCtrl::Private::AssignHoverArea(CPoint point)
-{	HANDLE hHoverAreaOld = m_hHoverArea;
-	m_hHoverArea = NULL;
+{	HTAB hHoverAreaOld = m_hHoverArea;
+	m_hHoverArea = nullptr;
 		// 
 	if(m_hCurTab && m_rcButtonClose.PtInRect(point))
 		m_hHoverArea = HANDLE_BUT_CLOSE;
@@ -1893,11 +1933,11 @@ void TabCtrl::Private::AssignHoverArea(CPoint point)
 	else if( m_rcButtonScrollRight.PtInRect(point) )
 		m_hHoverArea = HANDLE_BUT_SCROLLRIGHT;
 		// 
-	if(m_hHoverArea==NULL)
+	if(m_hHoverArea==nullptr)
 		m_hHoverArea = o.HitTest(point);
 		// 
 	if(hHoverAreaOld!=m_hHoverArea)
-		::RedrawWindow(o.m_hWnd,NULL,NULL,RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN);   // !!! not use Invalidate(...) - can be artifactes while tracking tab.
+		::RedrawWindow(o.m_hWnd,nullptr,nullptr,RDW_INVALIDATE | RDW_UPDATENOW | RDW_NOCHILDREN);   // !!! not use Invalidate(...) - can be artifactes while tracking tab.
 		// 
 	TRACKMOUSEEVENT tme = { sizeof(TRACKMOUSEEVENT),TME_LEAVE,o.m_hWnd,0 };
 	::TrackMouseEvent(&tme);
@@ -1906,7 +1946,7 @@ void TabCtrl::Private::AssignHoverArea(CPoint point)
 // 
 LRESULT TabCtrl::OnMouseLeave(WPARAM wp, LPARAM lp)
 {	if(p.m_hHoverArea)
-	{	p.m_hHoverArea = NULL;
+	{	p.m_hHoverArea = nullptr;
 		Invalidate(FALSE);
 	}
 		// 
@@ -1965,12 +2005,12 @@ void TabCtrl::Private::LButtonDown(CPoint point)
 				// 
 			if(m_hPushedArea==HANDLE_BUT_SCROLLLEFT)
 			{	StepLeft();
-				o.SetTimer(TimerIdScrollLeftClick,300,NULL);
+				o.SetTimer(TimerIdScrollLeftClick,300,nullptr);
 				Recalc(true);
 			}
 			else if(m_hPushedArea==HANDLE_BUT_SCROLLRIGHT)
 			{	StepRight();
-				o.SetTimer(TimerIdScrollRightClick,300,NULL);
+				o.SetTimer(TimerIdScrollRightClick,300,nullptr);
 				Recalc(true);
 			}
 				// 
@@ -2005,9 +2045,9 @@ void TabCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 				p.m_pNotifyManager->OnCloseButtonClicked(this,&p.m_rcButtonClose,pt);
 					// 
 				if(alive)
-				{	p.m_hPushedArea = NULL;
+				{	p.m_hPushedArea = nullptr;
 					Invalidate(FALSE);
-					p.m_pLifeStatus = NULL;
+					p.m_pLifeStatus = nullptr;
 				}
 			}
 			else if(menu)
@@ -2019,9 +2059,9 @@ void TabCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 				p.m_pNotifyManager->OnMenuButtonClicked(this,&p.m_rcButtonMenu,pt);
 					// 
 				if(alive)
-				{	p.m_hPushedArea = NULL;
+				{	p.m_hPushedArea = nullptr;
 					Invalidate(FALSE);
-					p.m_pLifeStatus = NULL;
+					p.m_pLifeStatus = nullptr;
 				}
 			}
 		}
@@ -2032,7 +2072,7 @@ void TabCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 void TabCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 {	p.SetFocusInChildWnd();
 		// 
-	if(p.m_hHoverArea==NULL || !p.IsSystemButton(p.m_hHoverArea))
+	if(p.m_hHoverArea==nullptr || !p.IsSystemButton(p.m_hHoverArea))
 		if(p.m_pNotifyManager)
 		{	CPoint pt(point);
 			ClientToScreen(&pt);
@@ -2046,7 +2086,7 @@ void TabCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 void TabCtrl::OnRButtonUp(UINT nFlags, CPoint point)
 {	CWnd::OnRButtonUp(nFlags, point);
 		// 
-	if(p.m_hHoverArea==NULL || !p.IsSystemButton(p.m_hHoverArea))
+	if(p.m_hHoverArea==nullptr || !p.IsSystemButton(p.m_hHoverArea))
 		if(p.m_pNotifyManager)
 		{	CPoint pt(point);
 			ClientToScreen(&pt);
@@ -2084,7 +2124,7 @@ void TabCtrl::Private::StopScrolling()
 			o.KillTimer(TimerIdScrollRightScrolling);
 		}
 			// 
-		m_hPushedArea = NULL;
+		m_hPushedArea = nullptr;
 		if(::GetCapture()==o.m_hWnd)
 			::ReleaseCapture();
 	}
@@ -2107,9 +2147,9 @@ void TabCtrl::Private::StartTabDragging(CPoint point)
 // 
 void TabCtrl::Private::StopTabDragging(bool cancel)
 {	if(m_hPushedArea && !IsSystemButton(m_hPushedArea))
-	{	HANDLE hPushedArea = m_hPushedArea;
+	{	HTAB hPushedArea = m_hPushedArea;
 			// 
-		m_hPushedArea = NULL;
+		m_hPushedArea = nullptr;
 		if(::GetCapture()==o.m_hWnd)
 			::ReleaseCapture();
 			// 
@@ -2154,7 +2194,7 @@ void TabCtrl::OnTimer(UINT_PTR nIDEvent)
 	{	case Private::TimerIdScrollLeftClick:
 			KillTimer(Private::TimerIdScrollLeftClick);
 			if(p.m_hPushedArea==Private::HANDLE_BUT_SCROLLLEFT)
-				SetTimer(Private::TimerIdScrollLeftScrolling,20,NULL);
+				SetTimer(Private::TimerIdScrollLeftScrolling,20,nullptr);
 			break;
 		case Private::TimerIdScrollLeftScrolling:
 			if(p.m_hHoverArea==Private::HANDLE_BUT_SCROLLLEFT)
@@ -2166,7 +2206,7 @@ void TabCtrl::OnTimer(UINT_PTR nIDEvent)
 		case Private::TimerIdScrollRightClick:
 			KillTimer(Private::TimerIdScrollRightClick);
 			if(p.m_hPushedArea==Private::HANDLE_BUT_SCROLLRIGHT)
-				SetTimer(Private::TimerIdScrollRightScrolling,20,NULL);
+				SetTimer(Private::TimerIdScrollRightScrolling,20,nullptr);
 			break;
 		case Private::TimerIdScrollRightScrolling:
 			if(p.m_hHoverArea==Private::HANDLE_BUT_SCROLLRIGHT)
@@ -2198,7 +2238,7 @@ void TabCtrl::OnSetFocus(CWnd* pOldWnd)
 /////////////////////////////////////////////////////////////////////////////
 // 
 void TabCtrl::Private::SetFocusInChildWnd()
-{	HANDLE tab = o.GetSelectedTab();
+{	HTAB tab = o.GetSelectedTab();
 	if(tab)
 	{	HWND wnd = o.GetTabWindow(tab);
 		if(wnd && ::IsWindow(wnd) && ::GetFocus()!=wnd)
@@ -2217,7 +2257,7 @@ BOOL TabCtrl::OnSetCursor(CWnd *pWnd, UINT nHitTest, UINT message)
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-bool TabCtrl::Private::IsSystemButton(HANDLE tab) const
+bool TabCtrl::Private::IsSystemButton(HTAB tab) const
 {	return tab==HANDLE_BUT_CLOSE || tab==HANDLE_BUT_MENU || tab==HANDLE_BUT_SCROLLLEFT || tab==HANDLE_BUT_SCROLLRIGHT;
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -2244,7 +2284,7 @@ bool TabCtrl::LoadState(CWinApp *app, TCHAR const *section, TCHAR const *entry)
 {	assert(app && section && entry);
 		//
 	bool res = false;
-	BYTE *pData = NULL;
+	BYTE *pData = nullptr;
 	UINT uDataSize;
 		// 
 	try
@@ -2310,7 +2350,7 @@ bool TabCtrl::Private::LoadStateInner(CArchive *ar)
 		*ar >> select;   // index of selected tab.
 		// 
 	int id, target;
-	HANDLE tab;
+	HTAB tab;
 		// 
 	for(int i=0; i<count; ++i)
 	{	*ar >> id;
@@ -2339,7 +2379,7 @@ void TabCtrl::Private::SaveStateInner(CArchive *ar) const
 	*ar << count;
 		// 
 	if(count>1)
-	{	HANDLE hSelTab = o.GetSelectedTab();
+	{	HTAB hSelTab = o.GetSelectedTab();
 		*ar << (hSelTab ? o.GetTabIndexByHandle(hSelTab) : -1);
 	}
 		// 
@@ -2368,7 +2408,7 @@ bool TabCtrl::Private::LoadImage(HMODULE moduleRes/*or null*/, UINT resID, bool 
 {	assert(resID);
 	assert(bmp);
 		// 
-	*bmp = NULL;
+	*bmp = nullptr;
 		// 
 	if(!moduleRes)
 		moduleRes = AfxFindResourceHandle(MAKEINTRESOURCE(resID),(pngImage ? _T("PNG") : RT_BITMAP));
@@ -2388,7 +2428,7 @@ bool TabCtrl::Private::LoadImage(HMODULE moduleRes/*or null*/, UINT resID, bool 
 						{	void *lpResBuffer = ::GlobalLock(hRes);
 							if(lpResBuffer)
 							{	memcpy(lpResBuffer, lpBuffer, uiSize);
-								IStream *pStream = NULL;
+								IStream *pStream = nullptr;
 								if(::CreateStreamOnHGlobal(hRes, FALSE, &pStream/*out*/)==S_OK)
 								{	*bmp = ::new (std::nothrow) Gdiplus::Bitmap(pStream,FALSE);
 									pStream->Release();
@@ -2406,7 +2446,7 @@ bool TabCtrl::Private::LoadImage(HMODULE moduleRes/*or null*/, UINT resID, bool 
 	{	::delete *bmp;
 		return false;
 	}
-	return (*bmp)!=NULL;
+	return (*bmp)!=nullptr;
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
@@ -2429,7 +2469,7 @@ bool TabCtrl::Private::CreateImageList(Gdiplus::Bitmap *bmp, int imageWidth,
 			{	Gdiplus::BitmapData data;
 				if(bmpCnvrt->LockBits(&rect,Gdiplus::ImageLockModeWrite,PixelFormat32bppARGB,&data)==Gdiplus::Ok)
 				{	CBitmap cbmp;
-					if( cbmp.CreateBitmap(rect.Width,rect.Height,1,32,NULL) )
+					if( cbmp.CreateBitmap(rect.Width,rect.Height,1,32,nullptr) )
 					{	const UINT maskRGB = (clrMask & 0x0000ff00) | (clrMask & 0xff)<<16 | (clrMask & 0x00ff0000)>>16;
 						const UINT number = data.Width * data.Height;
 						UINT32 *ptr = static_cast<UINT32 *>(data.Scan0);
@@ -2517,14 +2557,14 @@ void TabCtrlStyle_base::DrawControlAreaBack(TabCtrl const *ctrl, CDC *dc, CRect 
 /////////////////////////////////////////////////////////////////////////////
 // 
 void TabCtrlStyle_base::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
-{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==NULL)
+{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==nullptr)
 		FillSolidRect(dc,rect, GetEmptyWndsAreaBackColor(ctrl) );
 	else
 		FillSolidRect(dc,rect, GetTabSelectedBackColor(ctrl) );
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrlStyle_base::DrawTab(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRgn *rgn)
+void TabCtrlStyle_base::DrawTab(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRgn *rgn)
 {	const CRect rc = ctrl->GetTabRect(tab);
 		// draw background.
 	DrawTabBack(ctrl,dc,tab,&rc,rgn);
@@ -2534,7 +2574,7 @@ void TabCtrlStyle_base::DrawTab(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRgn *
 /////////////////////////////////////////////////////////////////////////////
 // Draw image and text.
 // 
-void TabCtrlStyle_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn *rgn)
+void TabCtrlStyle_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn *rgn)
 {	CRect rcTabPadding = ctrl->GetTabPadding();
 		// 
 	CRect rc(rect);
@@ -2545,12 +2585,12 @@ void TabCtrlStyle_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, HANDLE tab,
 	const int textWidth = dc->GetTextExtent(text).cx;
 		// 
 	Gdiplus::Bitmap *images;
-	(!disable ? ctrl->GetImage(&images/*out*/,NULL) : ctrl->GetImage(NULL,&images/*out*/));
+	(!disable ? ctrl->GetImage(&images/*out*/,nullptr) : ctrl->GetImage(nullptr,&images/*out*/));
 		// 
 		// draw image.
 	if(ctrl->GetTabImage(tab)>-1 && images)
 	{	CSize szImage;
-		(!disable ? ctrl->GetImageSize(&szImage,NULL) : ctrl->GetImageSize(NULL,&szImage));
+		(!disable ? ctrl->GetImageSize(&szImage,nullptr) : ctrl->GetImageSize(nullptr,&szImage));
 			// 
 		const int iContentWidth = szImage.cx + ctrl->GetTabImageTextSpace() + textWidth;
 		rc.left += (iContentWidth<rc.Width() ? (rc.Width()-iContentWidth)/2 : 0);
@@ -2568,12 +2608,12 @@ void TabCtrlStyle_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, HANDLE tab,
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrlStyle_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	const COLORREF clrBorder = GetTabBorderColor(ctrl);
 	const COLORREF clrBack = GetTabSelectedBackColor(ctrl);
 		// 
 	if(ctrl->GetSelectedTab()!=tab)
-	{	if(ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==NULL && !ctrl->IsTabDisabled(tab))   // highlighted tab.
+	{	if(ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==nullptr && !ctrl->IsTabDisabled(tab))   // highlighted tab.
 		{	CRect rc(rect);
 				// 
 			if(ctrl->GetLayout()==TabCtrl::LayoutTop)
@@ -2603,17 +2643,17 @@ void TabCtrlStyle_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CR
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrlStyle_base::DrawTabImage(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_base::DrawTabImage(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	Gdiplus::Bitmap *images;
 	CSize szImage;
 		// 
 	if( !ctrl->IsTabDisabled(tab) )
-	{	ctrl->GetImage(&images/*out*/,NULL);
-		ctrl->GetImageSize(&szImage/*out*/,NULL);
+	{	ctrl->GetImage(&images/*out*/,nullptr);
+		ctrl->GetImageSize(&szImage/*out*/,nullptr);
 	}
 	else
-	{	ctrl->GetImage(NULL,&images/*out*/);
-		ctrl->GetImageSize(NULL,&szImage/*out*/);
+	{	ctrl->GetImage(nullptr,&images/*out*/);
+		ctrl->GetImageSize(nullptr,&szImage/*out*/);
 	}
 	const CPoint pt(rect->left,(rect->top+rect->bottom-szImage.cy+1)/2);
 	const int image = ctrl->GetTabImage(tab);
@@ -2621,7 +2661,7 @@ void TabCtrlStyle_base::DrawTabImage(TabCtrl const *ctrl, CDC *dc, HANDLE tab, C
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrlStyle_base::DrawTabText(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_base::DrawTabText(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	const CString text = ctrl->GetTabText(tab);
 	dc->SetTextColor( GetTabTextColor(ctrl,tab) );
 	dc->DrawText(text,const_cast<CRect *>(rect),DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS);
@@ -2683,19 +2723,19 @@ void TabCtrlStyle_base::DrawButtonScrollRight(TabCtrl const *ctrl, CDC *dc, CRec
 CToolTipCtrl *TabCtrlStyle_base::CreateToolTip(TabCtrl *ctrl)
 {
 	#ifdef AFX_TOOLTIP_TYPE_ALL   // for MFC Feature Pack.
-		CToolTipCtrl *tooltip = NULL;
-		return (CTooltipManager::CreateToolTip(tooltip/*out*/,ctrl,AFX_TOOLTIP_TYPE_TAB) ? tooltip : NULL);
+		CToolTipCtrl *tooltip = nullptr;
+		return (CTooltipManager::CreateToolTip(tooltip/*out*/,ctrl,AFX_TOOLTIP_TYPE_TAB) ? tooltip : nullptr);
 	#else
-		CToolTipCtrl *toolTip = NULL;
+		CToolTipCtrl *toolTip = nullptr;
 		try
 		{	toolTip = new CToolTipCtrl;
 		}
 		catch(std::bad_alloc &)
-		{	return NULL;
+		{	return nullptr;
 		}
 		if( !toolTip->Create(ctrl,TTS_ALWAYSTIP) )
 		{	delete toolTip;
-			return NULL;
+			return nullptr;
 		}
 			// 
 		DWORD dwClassStyle = ::GetClassLong(toolTip->m_hWnd,GCL_STYLE);
@@ -2736,7 +2776,7 @@ COLORREF TabCtrlStyle_base::GetTabSelectedBackColor(TabCtrl const * /*ctrl*/)
 {	return ::GetSysColor(COLOR_WINDOW);
 }
 // 
-COLORREF TabCtrlStyle_base::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_base::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	return (!ctrl->IsTabDisabled(tab) ? ::GetSysColor(COLOR_BTNTEXT) : ::GetSysColor(COLOR_GRAYTEXT));
 }
 // 
@@ -2983,7 +3023,7 @@ COLORREF TabCtrlStyle_VS2003_base::GetCtrlAreaBackColor(TabCtrl const * /*ctrl*/
 {	return PixelAlpha(::GetSysColor(COLOR_BTNFACE),::GetSysColor(COLOR_BTNHIGHLIGHT),45);   // it is approximate color (VS2003 uses some another way).
 }
 // 
-COLORREF TabCtrlStyle_VS2003_base::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_VS2003_base::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	if(ctrl->GetSelectedTab()==tab)
 	{	if(!ctrl->IsWatchCtrlActivity() || ctrl->IsActive())
 			return ::GetSysColor(COLOR_BTNTEXT);
@@ -3037,7 +3077,7 @@ void TabCtrlStyle_VS2003_client::DrawControlAreaBack(TabCtrl const *ctrl, CDC *d
 	DrawLine(dc,rect->right-1,rect->top,rect->right-1,rect->bottom,GetWndsAreaBackColor(ctrl));
 }
 // 
-void TabCtrlStyle_VS2003_client::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_VS2003_client::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
 	const bool select = (ctrl->GetSelectedTab()==tab);
 		// 
@@ -3075,13 +3115,13 @@ void TabCtrlStyle_VS2003_client::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDL
 }
 // 
 void TabCtrlStyle_VS2003_client::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
-{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==NULL)
+{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==nullptr)
 		TabCtrlStyle_base::DrawWindowsAreaBack(ctrl,dc,rect);
 	else
 	{	CRect rc(rect);
 		FillSolidRect(dc,&rc,GetWndsAreaBackColor(ctrl));
 			// 
-		rc.DeflateRect( GetWindowsAreaPadding(ctrl,NULL) );
+		rc.DeflateRect( GetWindowsAreaPadding(ctrl,nullptr) );
 		rc.InflateRect(1,1);
 			// 
 		if( !rc.IsRectEmpty() )
@@ -3172,7 +3212,7 @@ void TabCtrlStyle_VS2003_bars::DrawControlAreaBack(TabCtrl const *ctrl, CDC *dc,
 	DrawLine(dc,rect->right-1,rect->top,rect->right-1,rect->bottom,clrWndsAreaBack);
 }
 // 
-void TabCtrlStyle_VS2003_bars::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_VS2003_bars::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
 	const bool select = (ctrl->GetSelectedTab()==tab);
 		// 
@@ -3259,7 +3299,7 @@ void TabCtrlStyle_VS2003_bars_custom1::DrawControlAreaBack(TabCtrl const *ctrl, 
 void TabCtrlStyle_VS2003_bars_custom1::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
 {	const int count = ctrl->GetNumberTabs();
 		// 
-	if(count==0 || ctrl->GetSelectedTab()==NULL)
+	if(count==0 || ctrl->GetSelectedTab()==nullptr)
 		TabCtrlStyle_base::DrawWindowsAreaBack(ctrl,dc,rect);
 	else
 	{	const COLORREF clrBorder = GetTabBorderColor(ctrl);
@@ -3339,7 +3379,7 @@ CRect TabCtrlStyle_VS2008_client_base::GetWindowsAreaPadding(TabCtrl const *ctrl
 CRect TabCtrlStyle_VS2008_client_base::GetTabPadding(TabCtrl const *ctrl, TabCtrl::IRecalc * /*base*/)
 {	return (ctrl->GetLayout()==TabCtrl::LayoutTop ? CRect(6,1/*border*/+2,6,3+2/*indent*/) : CRect(6,2/*indent*/+2,6,3+1/*border*/));
 }
-int TabCtrlStyle_VS2008_client_base::GetTabExtraWidth(TabCtrl const *ctrl, TabCtrl::IRecalc * /*base*/, HANDLE tab)
+int TabCtrlStyle_VS2008_client_base::GetTabExtraWidth(TabCtrl const *ctrl, TabCtrl::IRecalc * /*base*/, TabCtrl::HTAB tab)
 {	if( ctrl->GetTabIndexByHandle(tab) )
 		return 0;   // it isn't first tab.
 	return GetSlantWidth(ctrl) - 6;
@@ -3407,9 +3447,9 @@ void TabCtrlStyle_VS2008_client_base::DrawControlAreaBack(TabCtrl const *ctrl, C
 	dc->SelectObject(pOldPen);
 }
 // 
-void TabCtrlStyle_VS2008_client_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn *rgn)
+void TabCtrlStyle_VS2008_client_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn *rgn)
 {	const bool selected = (ctrl->GetSelectedTab()==tab);
-	const bool hover = (ctrl->GetTabUnderCursor()==tab) && (ctrl->GetPushedTab()==NULL);
+	const bool hover = (ctrl->GetTabUnderCursor()==tab) && (ctrl->GetPushedTab()==nullptr);
 	const bool disabled = ctrl->IsTabDisabled(tab);
 	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
 		// 
@@ -3467,7 +3507,7 @@ void TabCtrlStyle_VS2008_client_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, 
 	dc->SelectObject(pOldPen);
 }
 // 
-void TabCtrlStyle_VS2008_client_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn *rgn)
+void TabCtrlStyle_VS2008_client_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn *rgn)
 {	CRect rc(rect);
 	if(ctrl->GetSelectedTab()!=tab)
 		(ctrl->GetLayout()==TabCtrl::LayoutTop ? rc.top+=2 : rc.bottom-=2);
@@ -3478,7 +3518,7 @@ void TabCtrlStyle_VS2008_client_base::DrawTabContext(TabCtrl const *ctrl, CDC *d
 void TabCtrlStyle_VS2008_client_base::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
 {	const int count = ctrl->GetNumberTabs();
 		// 
-	if(count==0 || ctrl->GetSelectedTab()==NULL)
+	if(count==0 || ctrl->GetSelectedTab()==nullptr)
 		TabCtrlStyle_base::DrawWindowsAreaBack(ctrl,dc,rect);
 	else
 	{	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
@@ -3618,27 +3658,27 @@ void TabCtrlStyle_VS2008_client_base::DrawWindowsAreaBack(TabCtrl const *ctrl, C
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-HANDLE TabCtrlStyle_VS2008_client_base::HitTest(TabCtrl const *ctrl, IBehavior * /*base*/, CPoint point)   // get tab in the given point.
+TabCtrl::HTAB TabCtrlStyle_VS2008_client_base::HitTest(TabCtrl const *ctrl, IBehavior * /*base*/, CPoint point)   // get tab in the given point.
 {	if( CRect(ctrl->GetTabsArea()).PtInRect(point) )
 	{	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
 			// 
-		HANDLE hTabSel = ctrl->GetSelectedTab();
+		TabCtrl::HTAB hTabSel = ctrl->GetSelectedTab();
 		if(hTabSel && HitTest(ctrl,hTabSel,top,point))
 			return hTabSel;
 			// 
 		for(int i=0, c=ctrl->GetNumberTabs(); i<c; ++i)
-		{	HANDLE tab = ctrl->GetTabHandleByIndex(i);
+		{	TabCtrl::HTAB tab = ctrl->GetTabHandleByIndex(i);
 			if(tab!=hTabSel && HitTest(ctrl,tab,top,point))
 				return tab;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 // 
-bool TabCtrlStyle_VS2008_client_base::HitTest(TabCtrl const *ctrl, HANDLE tab, bool top, CPoint point) const
+bool TabCtrlStyle_VS2008_client_base::HitTest(TabCtrl const *ctrl, TabCtrl::HTAB tab, bool top, CPoint point) const
 {	const CRect rc = ctrl->GetTabRect(tab);
 	POINT pts[8];
-	GetTabOutline(ctrl,tab,&rc,top,pts,NULL);
+	GetTabOutline(ctrl,tab,&rc,top,pts,nullptr);
 		// 
 	CRgn rgn;
 	rgn.CreatePolygonRgn(pts,sizeof(pts)/sizeof(POINT),WINDING);
@@ -3646,7 +3686,7 @@ bool TabCtrlStyle_VS2008_client_base::HitTest(TabCtrl const *ctrl, HANDLE tab, b
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrlStyle_VS2008_client_base::GetTabOutline(TabCtrl const *ctrl, HANDLE tab, CRect const *rect, bool top, POINT pts[8]/*out*/, RECT *rcFill/*out*/) const
+void TabCtrlStyle_VS2008_client_base::GetTabOutline(TabCtrl const *ctrl, TabCtrl::HTAB tab, CRect const *rect, bool top, POINT pts[8]/*out*/, RECT *rcFill/*out*/) const
 {	const bool first = (ctrl->GetTabIndexByHandle(tab)==0);
 	const bool selected = (ctrl->GetSelectedTab()==tab);
 	int iSlantWidth = GetSlantWidth(ctrl);
@@ -3944,7 +3984,7 @@ void TabCtrlStyle_VS2008_bars_base::DrawControlAreaBack(TabCtrl const *ctrl, CDC
 		DrawLine(dc,rect->left,rect->top+2,rect->right,rect->top+2, clrBorder );
 }
 // 
-void TabCtrlStyle_VS2008_bars_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_VS2008_bars_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
 	const bool select = (ctrl->GetSelectedTab()==tab);
 	const int count = ctrl->GetNumberTabs();
@@ -3976,14 +4016,14 @@ void TabCtrlStyle_VS2008_bars_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HA
 		}
 	}
 	else	// tab isn't selected.
-	{	const bool hover = (ctrl->GetTabUnderCursor()==tab) && (ctrl->GetPushedTab()==NULL);
+	{	const bool hover = (ctrl->GetTabUnderCursor()==tab) && (ctrl->GetPushedTab()==nullptr);
 		const bool disabled = ctrl->IsTabDisabled(tab);
 			// 		
 		const COLORREF clrBorderHover = GetTabBorderColor(ctrl,true);
 		const COLORREF clrBackLight = GetTabGradientLightColor(ctrl,hover,disabled);
 		const COLORREF clrBackDark = GetTabGradientDarkColor(ctrl,hover,disabled);
 			// 
-		HANDLE tabSel = ctrl->GetSelectedTab();
+		TabCtrl::HTAB tabSel = ctrl->GetSelectedTab();
 		const int cmpRes = (tabSel ? ctrl->CompareTabsPosition(tab,tabSel) : -1);
 			// 
 		CRect rc(rect);
@@ -4070,7 +4110,7 @@ void TabCtrlStyle_VS2008_bars_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HA
 	dc->SelectObject(pOldPen);
 }
 // 
-void TabCtrlStyle_VS2008_bars_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn *rgn)
+void TabCtrlStyle_VS2008_bars_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn *rgn)
 {	CRect rc(rect);
 	if(ctrl->GetSelectedTab()==tab)
 		(ctrl->GetLayout()==TabCtrl::LayoutTop ? rc.top-=2 : rc.bottom+=2);
@@ -4078,7 +4118,7 @@ void TabCtrlStyle_VS2008_bars_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc,
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-COLORREF TabCtrlStyle_VS2008_bars_base::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_VS2008_bars_base::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	if( ctrl->IsTabDisabled(tab) )		// disabled.
 		return TabCtrlStyle_base::GetTabTextColor(ctrl,tab);
 	if(ctrl->GetSelectedTab()==tab)   // selected.
@@ -4216,7 +4256,7 @@ void TabCtrlStyle_VS2008_bars_custom1_base::DrawControlAreaBack(TabCtrl const *c
 void TabCtrlStyle_VS2008_bars_custom1_base::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
 {	const int count = ctrl->GetNumberTabs();
 		// 
-	if(count==0 || ctrl->GetSelectedTab()==NULL)
+	if(count==0 || ctrl->GetSelectedTab()==nullptr)
 		TabCtrlStyle_base::DrawWindowsAreaBack(ctrl,dc,rect);
 	else
 	{	const COLORREF clrBorder = GetTabBorderColor(ctrl,false);
@@ -4373,7 +4413,7 @@ void TabCtrlStyle_VS2010_client::DrawControlAreaBack(TabCtrl const *ctrl, CDC *d
 {	FillSolidRect(dc,rect, GetCtrlAreaBackColor(ctrl) );
 }
 // 
-void TabCtrlStyle_VS2010_client::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_VS2010_client::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	if( !ctrl->IsTabDisabled(tab) )
 	{	const bool active = ctrl->IsActive();
 		const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
@@ -4508,7 +4548,7 @@ void TabCtrlStyle_VS2010_client::DrawTabBack(TabCtrl const * /*ctrl*/, CDC *dc, 
 }
 // 
 void TabCtrlStyle_VS2010_client::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
-{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==NULL)
+{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==nullptr)
 		TabCtrlStyle_base::DrawWindowsAreaBack(ctrl,dc,rect);
 	else
 	{	const bool active = ctrl->IsActive();
@@ -4519,7 +4559,7 @@ void TabCtrlStyle_VS2010_client::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *d
 // 
 void TabCtrlStyle_VS2010_client::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect, bool top, bool active)
 {	CRect rc;
-	const HANDLE firstTab = (ctrl->GetNumberTabs()>0 ? ctrl->GetTabHandleByIndex(0) : NULL);
+	const TabCtrl::HTAB firstTab = (ctrl->GetNumberTabs()>0 ? ctrl->GetTabHandleByIndex(0) : nullptr);
 	const bool selectFirstTab = (ctrl->GetSelectedTab()==firstTab);
 	const bool scaleMode = (ctrl->GetBehavior()==TabCtrl::BehaviorScale);
 	const COLORREF clr = (active ? RGB(255,232,166) : RGB(206,212,223));
@@ -4627,7 +4667,7 @@ COLORREF TabCtrlStyle_VS2010_client::GetCtrlAreaBackColor(TabCtrl const * /*ctrl
 {	return RGB(46,64,94);
 }
 // 
-COLORREF TabCtrlStyle_VS2010_client::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_VS2010_client::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	return (ctrl->GetSelectedTab()==tab ? RGB(13,0,5) : RGB(248,255,255));
 }
 // 
@@ -4648,7 +4688,7 @@ COLORREF TabCtrlStyle_VS2010_client::GetButtonMenuColor(TabCtrl const * /*ctrl*/
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrlStyle_VS2010_client_custom1::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_VS2010_client_custom1::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	if( !ctrl->IsTabDisabled(tab) )
 	{	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
 		const bool select = (ctrl->GetSelectedTab()==tab);
@@ -4658,7 +4698,7 @@ void TabCtrlStyle_VS2010_client_custom1::DrawTabBack(TabCtrl const *ctrl, CDC *d
 }
 // 
 void TabCtrlStyle_VS2010_client_custom1::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
-{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==NULL)
+{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==nullptr)
 		TabCtrlStyle_base::DrawWindowsAreaBack(ctrl,dc,rect);
 	else
 	{	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
@@ -4672,7 +4712,7 @@ void TabCtrlStyle_VS2010_client_custom1::DrawWindowsAreaBack(TabCtrl const *ctrl
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrlStyle_VS2010_client_custom2::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_VS2010_client_custom2::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	if( !ctrl->IsTabDisabled(tab) )
 	{	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
 		const bool select = (ctrl->GetSelectedTab()==tab);
@@ -4682,7 +4722,7 @@ void TabCtrlStyle_VS2010_client_custom2::DrawTabBack(TabCtrl const *ctrl, CDC *d
 }
 // 
 void TabCtrlStyle_VS2010_client_custom2::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
-{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==NULL)
+{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==nullptr)
 		TabCtrlStyle_base::DrawWindowsAreaBack(ctrl,dc,rect);
 	else
 	{	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
@@ -4714,7 +4754,7 @@ void TabCtrlStyle_VS2010_bars::DrawControlAreaBack(TabCtrl const *ctrl, CDC *dc,
 {	FillSolidRect(dc,rect, GetCtrlAreaBackColor(ctrl) );
 }
 // 
-void TabCtrlStyle_VS2010_bars::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_VS2010_bars::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	if( !ctrl->IsTabDisabled(tab) )
 	{	const bool top = (ctrl->GetLayout()==TabCtrl::LayoutTop);
 		const bool select = (ctrl->GetSelectedTab()==tab);
@@ -4819,7 +4859,7 @@ COLORREF TabCtrlStyle_VS2010_bars::GetCtrlAreaBackColor(TabCtrl const * /*ctrl*/
 {	return RGB(46,64,94);
 }
 // 
-COLORREF TabCtrlStyle_VS2010_bars::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_VS2010_bars::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	return (ctrl->GetSelectedTab()==tab ? RGB(13,0,5) : RGB(248,255,255));
 }
 // 
@@ -4857,7 +4897,7 @@ CRect TabCtrlStyle_VS2019_client_base::GetWindowsAreaPadding(TabCtrl const *ctrl
 void TabCtrlStyle_VS2019_client_base::DrawControlAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
 {	FillSolidRect(dc,rect, GetCtrlAreaBackColor(ctrl) );
 		// 
-	const CRect rcCtrlAreaPadding = GetControlAreaPadding(ctrl,NULL);
+	const CRect rcCtrlAreaPadding = GetControlAreaPadding(ctrl,nullptr);
 	CRect rc = (ctrl->GetLayout()==TabCtrl::LayoutTop ?
 		CRect(rect->left+rcCtrlAreaPadding.left,rect->bottom-2,rect->right-rcCtrlAreaPadding.right,rect->bottom) :
 		CRect(rect->left+rcCtrlAreaPadding.left,rect->top,rect->right-rcCtrlAreaPadding.right,rect->top+2));
@@ -4872,7 +4912,7 @@ void TabCtrlStyle_VS2019_client_base::DrawWindowsAreaBack(TabCtrl const *ctrl, C
 	CPen *pOldPen = dc->SelectObject(&pen);
 		// 
 	const bool top = ctrl->GetLayout()==TabCtrl::LayoutTop;
-	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==NULL)
+	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==nullptr)
 	{	CRect rc(rect);
 		(top ? rc.DeflateRect(1,0,1,1) : rc.DeflateRect(1,1,1,0));
 		FillSolidRect(dc,&rc, GetEmptyWndsAreaBackColor(ctrl) );
@@ -4902,11 +4942,11 @@ COLORREF TabCtrlStyle_VS2019_client_base::GetTabSelectedBackColor(TabCtrl const 
 }
 /////////////////////////////////////////////////////////////////////////////
 //
-void TabCtrlStyle_VS2019_client_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_VS2019_client_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	if(ctrl->GetSelectedTab()==tab)
 		FillSolidRect(dc,rect, GetTabSelectedBackColor(ctrl) );
 	else
-		if(ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==NULL && !ctrl->IsTabDisabled(tab))   // highlighted tab.
+		if(ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==nullptr && !ctrl->IsTabDisabled(tab))   // highlighted tab.
 		{	FillSolidRect(dc,rect, GetTabHighlightedBackColor(ctrl) );
 			(ctrl->GetLayout()==TabCtrl::LayoutTop ?
 				DrawLine(dc,rect->left,rect->bottom-1,rect->right,rect->bottom-1, GetCtrlAreaBackColor(ctrl) ) :
@@ -4915,7 +4955,7 @@ void TabCtrlStyle_VS2019_client_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, 
 }
 /////////////////////////////////////////////////////////////////////////////
 //
-void TabCtrlStyle_VS2019_client_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn *rgn)
+void TabCtrlStyle_VS2019_client_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn *rgn)
 {	if(ctrl->GetSelectedTab()==tab)
 	{	CRect rc(rect);
 		(ctrl->GetLayout()==TabCtrl::LayoutTop ? rc.OffsetRect(0,1) : rc.OffsetRect(0,-1));
@@ -4950,12 +4990,12 @@ COLORREF TabCtrlStyle_VS2019_client_light::GetCtrlAreaBackColor(TabCtrl const * 
 }
 /////////////////////////////////////////////////////////////////////////////
 //
-COLORREF TabCtrlStyle_VS2019_client_light::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_VS2019_client_light::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	if( ctrl->IsTabDisabled(tab) )
 		return RGB(109,109,109);
 	if(ctrl->GetSelectedTab()==tab)
 		return (!ctrl->IsWatchCtrlActivity() || ctrl->IsActive() ? RGB(255,255,255) : RGB(109,109,109));
-	return (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==NULL && !ctrl->IsTabDisabled(tab) ?   // highlighted tab.
+	return (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==nullptr && !ctrl->IsTabDisabled(tab) ?   // highlighted tab.
 		RGB(255,255,255) : RGB(0,0,0));
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -4998,7 +5038,7 @@ COLORREF TabCtrlStyle_VS2019_client_dark::GetCtrlAreaBackColor(TabCtrl const * /
 {	return RGB(45,45,48);
 }
 // 
-COLORREF TabCtrlStyle_VS2019_client_dark::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_VS2019_client_dark::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	return (!ctrl->IsTabDisabled(tab) ? RGB(255,255,255) : RGB(160,160,160));
 }
 // 
@@ -5044,7 +5084,7 @@ CRect TabCtrlStyle_VS2019_client_blue::GetWindowsAreaPadding(TabCtrl const * /*c
 /////////////////////////////////////////////////////////////////////////////
 //
 void TabCtrlStyle_VS2019_client_blue::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
-{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==NULL)
+{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==nullptr)
 		FillSolidRect(dc,rect, GetEmptyWndsAreaBackColor(ctrl) );
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -5054,12 +5094,12 @@ COLORREF TabCtrlStyle_VS2019_client_blue::GetCtrlAreaBackColor(TabCtrl const * /
 {	return RGB(93,107,153);
 }
 // 
-COLORREF TabCtrlStyle_VS2019_client_blue::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_VS2019_client_blue::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	if( ctrl->IsTabDisabled(tab) )
 		return RGB(197,203,224);
 	if(ctrl->GetSelectedTab()==tab)
 		return (!ctrl->IsWatchCtrlActivity() || ctrl->IsActive() ? RGB(30,30,30) : RGB(1,36,96));
-	return (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==NULL && !ctrl->IsTabDisabled(tab) ?   // highlighted tab.
+	return (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==nullptr && !ctrl->IsTabDisabled(tab) ?   // highlighted tab.
 		RGB(33,52,73) : RGB(255,255,255));
 }
 // 
@@ -5071,11 +5111,11 @@ COLORREF TabCtrlStyle_VS2019_client_blue::GetButtonMenuColor(TabCtrl const * /*c
 }
 /////////////////////////////////////////////////////////////////////////////
 //
-void TabCtrlStyle_VS2019_client_blue::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn *rgn)
+void TabCtrlStyle_VS2019_client_blue::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn *rgn)
 {	if(ctrl->GetSelectedTab()==tab)
 		TabCtrlStyle_VS2019_client_base::DrawTabBack(ctrl,dc,tab,rect,rgn);
 	else
-	{	const bool highlighted = (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==NULL && !ctrl->IsTabDisabled(tab));   // highlighted tab.
+	{	const bool highlighted = (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==nullptr && !ctrl->IsTabDisabled(tab));   // highlighted tab.
 		FillSolidRect(dc,rect, (highlighted ? GetTabHighlightedBackColor(ctrl) : GetTabNormalBackColor(ctrl)));
 		DrawRect(dc,rect, GetCtrlAreaBackColor(ctrl) );
 	}
@@ -5148,7 +5188,7 @@ void TabCtrlStyle_VS2019_bars_base::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC
 	CPen *pOldPen = dc->SelectObject(&pen);
 		// 
 	const bool top = ctrl->GetLayout()==TabCtrl::LayoutTop;
-	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==NULL)
+	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==nullptr)
 	{	CRect rc(rect);
 		(top ? rc.DeflateRect(1,0,1,1) : rc.DeflateRect(1,1,1,0));
 		FillSolidRect(dc,&rc, GetEmptyWndsAreaBackColor(ctrl) );
@@ -5172,7 +5212,7 @@ void TabCtrlStyle_VS2019_bars_base::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-void TabCtrlStyle_VS2019_bars_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_VS2019_bars_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	CRect rc(rect);
 		// 
 	if(ctrl->GetSelectedTab()==tab)
@@ -5201,7 +5241,7 @@ void TabCtrlStyle_VS2019_bars_base::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HA
 		dc->SelectObject(pOldPen);
 	}
 	else
-		if(ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==NULL && !ctrl->IsTabDisabled(tab))   // highlighted tab.
+		if(ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==nullptr && !ctrl->IsTabDisabled(tab))   // highlighted tab.
 		{	(ctrl->GetLayout()==TabCtrl::LayoutTop ? --rc.bottom : ++rc.top);
 			FillSolidRect(dc,&rc, GetTabHighlightedBackColor(ctrl) );
 		}
@@ -5243,12 +5283,12 @@ COLORREF TabCtrlStyle_VS2019_bars_light::GetTabSelectedBackColor(TabCtrl const *
 {	return RGB(245,245,245);
 }
 // 
-COLORREF TabCtrlStyle_VS2019_bars_light::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_VS2019_bars_light::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	if( ctrl->IsTabDisabled(tab) )
 		return RGB(109,109,109);
 	if(ctrl->GetSelectedTab()==tab)
 		return (!ctrl->IsWatchCtrlActivity() || ctrl->IsActive() ? RGB(14,112,192) : RGB(109,109,109));
-	return (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==NULL && !ctrl->IsTabDisabled(tab) ?   // highlighted tab.
+	return (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==nullptr && !ctrl->IsTabDisabled(tab) ?   // highlighted tab.
 		RGB(30,30,30) : RGB(68,68,68));
 }
 // 
@@ -5289,12 +5329,12 @@ COLORREF TabCtrlStyle_VS2019_bars_dark::GetTabSelectedBackColor(TabCtrl const * 
 {	return RGB(37,37,38);
 }
 //
-COLORREF TabCtrlStyle_VS2019_bars_dark::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_VS2019_bars_dark::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	if( ctrl->IsTabDisabled(tab) )
 		return RGB(160,160,160);
 	if(ctrl->GetSelectedTab()==tab)
 		return (!ctrl->IsWatchCtrlActivity() || ctrl->IsActive() ? RGB(14,151,221) : RGB(160,160,160));
-	return (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==NULL && !ctrl->IsTabDisabled(tab) ?   // highlighted tab.
+	return (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==nullptr && !ctrl->IsTabDisabled(tab) ?   // highlighted tab.
 		RGB(85,170,255) : RGB(208,208,208));
 }
 //
@@ -5347,7 +5387,7 @@ void TabCtrlStyle_VS2019_bars_blue::DrawControlAreaBack(TabCtrl const *ctrl, CDC
 /////////////////////////////////////////////////////////////////////////////
 //
 void TabCtrlStyle_VS2019_bars_blue::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect)
-{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==NULL)
+{	if(ctrl->GetNumberTabs()==0 || ctrl->GetSelectedTab()==nullptr)
 		FillSolidRect(dc,rect, GetEmptyWndsAreaBackColor(ctrl) );
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -5361,12 +5401,12 @@ COLORREF TabCtrlStyle_VS2019_bars_blue::GetTabSelectedBackColor(TabCtrl const * 
 {	return RGB(247,249,254);
 }
 // 
-COLORREF TabCtrlStyle_VS2019_bars_blue::GetTabTextColor(TabCtrl const *ctrl, HANDLE tab)
+COLORREF TabCtrlStyle_VS2019_bars_blue::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	if( ctrl->IsTabDisabled(tab) )
 		return RGB(197,203,224);
 	if(ctrl->GetSelectedTab()==tab)
 		return (!ctrl->IsWatchCtrlActivity() || ctrl->IsActive() ? RGB(30,30,30) : RGB(80,80,80));
-	return (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==NULL && !ctrl->IsTabDisabled(tab) ?   // highlighted tab.
+	return (ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==nullptr && !ctrl->IsTabDisabled(tab) ?   // highlighted tab.
 		RGB(30,30,30) : RGB(217,225,250));
 }
 // 
@@ -5378,7 +5418,7 @@ COLORREF TabCtrlStyle_VS2019_bars_blue::GetButtonMenuColor(TabCtrl const * /*ctr
 }
 /////////////////////////////////////////////////////////////////////////////
 //
-void TabCtrlStyle_VS2019_bars_blue::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HANDLE tab, CRect const *rect, CRgn * /*rgn*/)
+void TabCtrlStyle_VS2019_bars_blue::DrawTabBack(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB tab, CRect const *rect, CRgn * /*rgn*/)
 {	CRect rc(rect);
 	const int number = ctrl->GetNumberTabs();
 	if(number>1)
@@ -5393,7 +5433,7 @@ void TabCtrlStyle_VS2019_bars_blue::DrawTabBack(TabCtrl const *ctrl, CDC *dc, HA
 		FillSolidRect(dc,&rc, GetTabSelectedBackColor(ctrl) );
 	else
 	{	rc.DeflateRect(0,1);
-		if(ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==NULL && !ctrl->IsTabDisabled(tab))   // highlighted tab.
+		if(ctrl->GetTabUnderCursor()==tab && ctrl->GetPushedTab()==nullptr && !ctrl->IsTabDisabled(tab))   // highlighted tab.
 			FillSolidRect(dc,&rc, GetTabHighlightedBackColor(ctrl) );
 		else
 			FillSolidRect(dc,&rc, GetTabNormalBackColor(ctrl) );

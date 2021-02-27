@@ -54,7 +54,7 @@ Class `TabCtrl` not perform any rendering. For its drawing, it calls the functio
 
 Similarly, a `TabCtrl::IRecalc` interface is used to specify the size and spacing between `TabCtrl` areas. A `TabCtrl::IBehavior` interface will help you adjust the behavior of the `TabCtrl`, and a `TabCtrl::ToolTip` will help you create tooltips for tabs and buttons. There is also a `TabCtrl::Ability` class for setting the ability to click on buttons and a `TabCtrl::Notify` class for notifying about events in `TabCtrl`.
 
-If you implement any of the above interfaces, then this implementation must exist for the entire time the control is running. If you are working with only one style, then use the template class TabCtrlEx. The name of the style class is specified as a template parameter, for example: 
+If you implement any of the above interfaces, then this implementation must exist for the entire time the control is running. If you are working with only one style, then use the template class TabCtrlEx. The name of the style class is specified as a template parameter, for example:
 
 ```cpp
 TabCtrlEx<TabCtrlStyle_VS2003_client> m_TabCtrl;
@@ -62,7 +62,7 @@ TabCtrlEx<TabCtrlStyle_VS2003_client> m_TabCtrl;
 
 Some styles have already been created. For example, styles similar to the docking/floating panels in Visual Studio 2003, 2008, 2010 and 2019. See the `TabCtrlComplex` class in the DemoDlg.h file for a list of all existing style classes.
 
-Classes `TabCtrlRecalcStub` and `TabCtrlBehaviorStub` create a default implementation for the functions of `TabCtrl::IRecalc` and `TabCtrl::IBehavior` interfaces respectively. You can use them to create your own style classes.
+Classes `ITabCtrlStyle::RecalcStub` and `ITabCtrlStyle::BehaviorStub` create a default implementation for the functions of `TabCtrl::IRecalc` and `TabCtrl::IBehavior` interfaces respectively. You can use them to create your own style classes.
 
 The control requires a call of `Update()` after you add or delete tabs, as well as change its properties and state.
 
