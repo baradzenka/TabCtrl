@@ -217,7 +217,7 @@ public:
 	Behavior m_Behavior;
 		// 
 	struct Image
-	{	Gdiplus::Bitmap *bmp;
+	{	Gdiplus::Bitmap *bmp, *bmpRef;
 		CSize size;
 	} m_ImageSys, m_ImageNormal,m_ImageDisable;
 	COLORREF m_clrImageSysTransp, m_clrImageTransp;
@@ -360,7 +360,9 @@ TabCtrl::Private::Private(TabCtrl &owner) : o(owner)
 	m_Layout = LayoutTop;
 	m_Behavior = BehaviorScale;
 		// 
-	m_ImageSys.bmp = m_ImageNormal.bmp = m_ImageDisable.bmp = nullptr;
+	m_ImageSys.bmp = m_ImageSys.bmpRef = nullptr;
+	m_ImageNormal.bmp = m_ImageNormal.bmpRef = nullptr;
+	m_ImageDisable.bmp = m_ImageDisable.bmpRef = nullptr;
 	m_ImageSys.size.SetSize(0,0);
 	m_ImageNormal.size = m_ImageDisable.size = m_ImageSys.size;
 	m_hCursor = nullptr;
@@ -693,32 +695,47 @@ TabCtrl::Behavior TabCtrl::GetBehavior() const
 /////////////////////////////////////////////////////////////////////////////
 // 
 bool TabCtrl::CreateSystemImage(HMODULE moduleRes/*or null*/, UINT resID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
-{	if(p.m_ImageSys.bmp)
+{	assert(!resID || imageWidth>0);
+		// 
+	if(p.m_ImageSys.bmp)
 	{	::delete p.m_ImageSys.bmp;
 		p.m_ImageSys.bmp = nullptr;
 	}
 		// 
-	bool res = true;
-	if(resID)
-		if( !p.LoadImage(moduleRes,resID,pngImage,&p.m_ImageSys.bmp/*out*/) )
-			res = false;
+	const bool res = (!resID || p.LoadImage(moduleRes,resID,pngImage,&p.m_ImageSys.bmp/*out*/));
+	p.m_ImageSys.bmpRef = p.m_ImageSys.bmp;
 		// 
-	(p.m_ImageSys.bmp ?
-		p.m_ImageSys.size.SetSize(imageWidth, p.m_ImageSys.bmp->GetHeight() ) :
+	(p.m_ImageSys.bmpRef ?
+		p.m_ImageSys.size.SetSize(imageWidth, p.m_ImageSys.bmpRef->GetHeight() ) :
 		p.m_ImageSys.size.SetSize(0,0));
 	p.m_clrImageSysTransp = clrTransp;
 		// 
 	return res;
 }
+// 
+void TabCtrl::SetSystemImageRef(Gdiplus::Bitmap *bmp, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
+{	assert(!bmp || imageWidth>0);
+		// 
+	if(p.m_ImageSys.bmp)
+	{	::delete p.m_ImageSys.bmp;
+		p.m_ImageSys.bmp = nullptr;
+	}
+	p.m_ImageSys.bmpRef = bmp;
+		// 
+	(p.m_ImageSys.bmpRef ?
+		p.m_ImageSys.size.SetSize(imageWidth, p.m_ImageSys.bmpRef->GetHeight() ) :
+		p.m_ImageSys.size.SetSize(0,0));
+	p.m_clrImageSysTransp = clrTransp;
+}
 //
 Gdiplus::Bitmap *TabCtrl::GetSystemImage() const
-{	return p.m_ImageSys.bmp;
+{	return p.m_ImageSys.bmpRef;
 }
 // 
 bool TabCtrl::GetSystemImageList(COLORREF clrDstBack/*or CLR_NONE*/, CImageList *imageList/*out*/) const
 {	assert(imageList);
 		// 
-	return p.m_ImageSys.bmp && p.CreateImageList(p.m_ImageSys.bmp, p.m_ImageSys.size.cx, p.m_clrImageSysTransp, clrDstBack, imageList/*out*/);
+	return p.m_ImageSys.bmpRef && p.CreateImageList(p.m_ImageSys.bmpRef, p.m_ImageSys.size.cx, p.m_clrImageSysTransp, clrDstBack, imageList/*out*/);
 }
 // 
 CSize TabCtrl::GetSystemImageSize() const
@@ -732,7 +749,9 @@ COLORREF TabCtrl::GetSystemImageTranspColor() const
 /////////////////////////////////////////////////////////////////////////////
 //
 bool TabCtrl::CreateImage(HMODULE moduleRes/*or null*/, UINT resNormalID/*or 0*/, UINT resDisableID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
-{	if(p.m_ImageNormal.bmp)
+{	assert((!resNormalID && !resDisableID) || imageWidth>0);
+		// 
+	if(p.m_ImageNormal.bmp)
 	{	::delete p.m_ImageNormal.bmp;
 		p.m_ImageNormal.bmp = nullptr;
 	}
@@ -748,31 +767,57 @@ bool TabCtrl::CreateImage(HMODULE moduleRes/*or null*/, UINT resNormalID/*or 0*/
 	if(resDisableID)
 		if( !p.LoadImage(moduleRes,resDisableID,pngImage,&p.m_ImageDisable.bmp/*out*/) )
 			res = false;
+	p.m_ImageNormal.bmpRef = p.m_ImageNormal.bmp;
+	p.m_ImageDisable.bmpRef = p.m_ImageDisable.bmp;
 		// 
-	(p.m_ImageNormal.bmp ?
-		p.m_ImageNormal.size.SetSize(imageWidth, p.m_ImageNormal.bmp->GetHeight() ) :
+	(p.m_ImageNormal.bmpRef ?
+		p.m_ImageNormal.size.SetSize(imageWidth, p.m_ImageNormal.bmpRef->GetHeight() ) :
 		p.m_ImageNormal.size.SetSize(0,0));
-	(p.m_ImageDisable.bmp ?
-		p.m_ImageDisable.size.SetSize(imageWidth, p.m_ImageDisable.bmp->GetHeight() ) :
+	(p.m_ImageDisable.bmpRef ?
+		p.m_ImageDisable.size.SetSize(imageWidth, p.m_ImageDisable.bmpRef->GetHeight() ) :
 		p.m_ImageDisable.size.SetSize(0,0));
 	p.m_clrImageTransp = clrTransp;
 		// 
 	return res;
 }
 //
+void TabCtrl::SetImageRef(Gdiplus::Bitmap *bmpNormal/*or 0*/, Gdiplus::Bitmap *bmpDisable/*or 0*/, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
+{	assert((!bmpNormal && !bmpDisable) || imageWidth>0);
+		// 
+	if(p.m_ImageNormal.bmp)
+	{	::delete p.m_ImageNormal.bmp;
+		p.m_ImageNormal.bmp = nullptr;
+	}
+	if(p.m_ImageDisable.bmp)
+	{	::delete p.m_ImageDisable.bmp;
+		p.m_ImageDisable.bmp = nullptr;
+	}
+		// 
+	p.m_ImageNormal.bmpRef = bmpNormal;
+	p.m_ImageDisable.bmpRef = bmpDisable;
+		// 
+	(p.m_ImageNormal.bmpRef ?
+		p.m_ImageNormal.size.SetSize(imageWidth, p.m_ImageNormal.bmpRef->GetHeight() ) :
+		p.m_ImageNormal.size.SetSize(0,0));
+	(p.m_ImageDisable.bmpRef ?
+		p.m_ImageDisable.size.SetSize(imageWidth, p.m_ImageDisable.bmpRef->GetHeight() ) :
+		p.m_ImageDisable.size.SetSize(0,0));
+	p.m_clrImageTransp = clrTransp;
+}
+//
 void TabCtrl::GetImage(Gdiplus::Bitmap **normal/*out,or null*/, Gdiplus::Bitmap **disable/*out,or null*/) const
 {	if(normal)
-		*normal = p.m_ImageNormal.bmp;
+		*normal = p.m_ImageNormal.bmpRef;
 	if(disable)
-		*disable = p.m_ImageDisable.bmp;
+		*disable = p.m_ImageDisable.bmpRef;
 }
 //
 bool TabCtrl::GetImageList(COLORREF clrDstBack/*or CLR_NONE*/, CImageList *normal/*out,or null*/, CImageList *disable/*out,or null*/) const
 {	if(normal)
-		if(!p.m_ImageNormal.bmp || !p.CreateImageList(p.m_ImageNormal.bmp, p.m_ImageNormal.size.cx, p.m_clrImageTransp, clrDstBack, normal/*out*/))
+		if(!p.m_ImageNormal.bmpRef || !p.CreateImageList(p.m_ImageNormal.bmpRef, p.m_ImageNormal.size.cx, p.m_clrImageTransp, clrDstBack, normal/*out*/))
 			return false;
 	if(disable)
-		if(!p.m_ImageDisable.bmp || !p.CreateImageList(p.m_ImageDisable.bmp, p.m_ImageDisable.size.cx, p.m_clrImageTransp, clrDstBack, disable/*out*/))
+		if(!p.m_ImageDisable.bmpRef || !p.CreateImageList(p.m_ImageDisable.bmpRef, p.m_ImageDisable.size.cx, p.m_clrImageTransp, clrDstBack, disable/*out*/))
 			return false;
 	return true;
 }
@@ -1055,10 +1100,10 @@ void TabCtrl::Private::Recalc(bool redraw)
 		CalcTabsWidth();
 			// 
 			// 
-		const bool bShowCloseButton = (m_bShowButtonClose && m_ImageSys.bmp && m_pAbilityManager->CanShowButtonClose(&o));
-		const bool bShowMenuButton = (m_bShowButtonMenu && m_ImageSys.bmp && m_pAbilityManager->CanShowButtonMenu(&o));
+		const bool bShowCloseButton = (m_bShowButtonClose && m_ImageSys.bmpRef && m_pAbilityManager->CanShowButtonClose(&o));
+		const bool bShowMenuButton = (m_bShowButtonMenu && m_ImageSys.bmpRef && m_pAbilityManager->CanShowButtonMenu(&o));
 		const bool bShowScrollButtons = (m_Behavior==BehaviorScroll && m_bShowButtonsScroll && 
-			m_ImageSys.bmp && m_pAbilityManager->CanShowButtonScroll(&o));
+			m_ImageSys.bmpRef && m_pAbilityManager->CanShowButtonScroll(&o));
 			// 
 		const int iSysImagePosY = (m_rcTabs.top + m_rcTabs.bottom - m_ImageSys.size.cy) / 2;
 			// 
@@ -1289,8 +1334,8 @@ int TabCtrl::Private::CalcTabWidth(HTAB tab)
 	int imageWidth = 0;
 		// 
 	if(HandleToTab(tab)->image!=-1 &&
-		((!HandleToTab(tab)->disable && m_ImageNormal.bmp) || 
-		(HandleToTab(tab)->disable && m_ImageDisable.bmp)))
+		((!HandleToTab(tab)->disable && m_ImageNormal.bmpRef) || 
+		(HandleToTab(tab)->disable && m_ImageDisable.bmpRef)))
 			imageWidth = (!HandleToTab(tab)->disable ? m_ImageNormal.size.cx : m_ImageDisable.size.cx) + o.GetTabImageTextSpace();
 		// 
 	CClientDC dc(&o);

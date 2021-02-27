@@ -131,12 +131,14 @@ public:
 		SysImageButtonScrollRightAllow, SysImageButtonScrollRightForbid
 	};
 	bool CreateSystemImage(HMODULE moduleRes/*or null*/, UINT resID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp=CLR_NONE);   // system images must have the same order as SysImage enum.
+	void SetSystemImageRef(Gdiplus::Bitmap *bmp, int imageWidth, COLORREF clrTransp=CLR_NONE);   // set reference to another ImageList.
 	Gdiplus::Bitmap *GetSystemImage() const;
 	bool GetSystemImageList(COLORREF clrDstBack/*or CLR_NONE*/, CImageList *imageList/*out*/) const;
 	CSize GetSystemImageSize() const;
 	COLORREF GetSystemImageTranspColor() const;
 		// 
 	bool CreateImage(HMODULE moduleRes/*or null*/, UINT resNormalID/*or 0*/, UINT resDisableID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp=CLR_NONE);
+	void SetImageRef(Gdiplus::Bitmap *bmpNormal/*or 0*/, Gdiplus::Bitmap *bmpDisable/*or 0*/, int imageWidth, COLORREF clrTransp=CLR_NONE);   // set reference to another ImageList.
 	void GetImage(Gdiplus::Bitmap **normal/*out,or null*/, Gdiplus::Bitmap **disable/*out,or null*/) const;
 	bool GetImageList(COLORREF clrDstBack/*or CLR_NONE*/, CImageList *normal/*out,or null*/, CImageList *disable/*out,or null*/) const;
 	void GetImageSize(CSize *szNormal/*out,or null*/, CSize *szDisable/*out,or null*/) const;
