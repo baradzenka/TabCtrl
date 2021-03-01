@@ -2717,11 +2717,11 @@ void TabCtrlStyle_base::DrawTabText(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB 
 // 
 void TabCtrlStyle_base::DrawButtonFrame(TabCtrl const * /*ctrl*/, CDC *dc, CRect const *rect, bool hover, bool pushed)
 {	if(hover!=pushed)
-	{	FillSolidRect(dc,rect,PixelAlpha(::GetSysColor(COLOR_HIGHLIGHT),::GetSysColor(COLOR_WINDOW),30));   // it is approximate color (VisualStudio uses some another way).
+	{	FillSolidRect(dc,rect,MixingColors(::GetSysColor(COLOR_HIGHLIGHT),::GetSysColor(COLOR_WINDOW),30));   // it is approximate color (VisualStudio uses some another way).
 		DrawRect(dc,rect, ::GetSysColor(COLOR_HIGHLIGHT) );
 	}
 	else if(hover && pushed)
-	{	FillSolidRect(dc,rect,PixelAlpha(::GetSysColor(COLOR_HIGHLIGHT),::GetSysColor(COLOR_WINDOW),22));   // it is approximate color (VisualStudio uses some another way).
+	{	FillSolidRect(dc,rect,MixingColors(::GetSysColor(COLOR_HIGHLIGHT),::GetSysColor(COLOR_WINDOW),22));   // it is approximate color (VisualStudio uses some another way).
 		DrawRect(dc,rect, ::GetSysColor(COLOR_HIGHLIGHT) );
 	}
 }
@@ -2985,7 +2985,7 @@ void TabCtrlStyle_base::DrawRect(CDC *pDC, CRect const *rect)
 }
 /////////////////////////////////////////////////////////////////////////////
 	// 
-COLORREF TabCtrlStyle_base::PixelAlpha(COLORREF src, COLORREF dst, int percent)
+COLORREF TabCtrlStyle_base::MixingColors(COLORREF src, COLORREF dst, int percent)
 {	const int ipercent = 100 - percent;
 	return RGB(
 		(GetRValue(src) * percent + GetRValue(dst) * ipercent) / 100,
@@ -3067,28 +3067,28 @@ void TabCtrlStyle_VS2003_base::DrawButtonFrame(TabCtrl const * /*ctrl*/, CDC *dc
 /////////////////////////////////////////////////////////////////////////////
 // 
 COLORREF TabCtrlStyle_VS2003_base::GetCtrlAreaBackColor(TabCtrl const * /*ctrl*/)
-{	return PixelAlpha(::GetSysColor(COLOR_BTNFACE),::GetSysColor(COLOR_BTNHIGHLIGHT),45);   // it is approximate color (VS2003 uses some another way).
+{	return MixingColors(::GetSysColor(COLOR_BTNFACE),::GetSysColor(COLOR_BTNHIGHLIGHT),45);   // it is approximate color (VS2003 uses some another way).
 }
 // 
 COLORREF TabCtrlStyle_VS2003_base::GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab)
 {	if(ctrl->GetSelectedTab()==tab)
 	{	if(!ctrl->IsWatchCtrlActivity() || ctrl->IsActive())
 			return ::GetSysColor(COLOR_BTNTEXT);
-		return PixelAlpha(::GetSysColor(COLOR_BTNSHADOW),RGB(0,0,0),55);
+		return MixingColors(::GetSysColor(COLOR_BTNSHADOW),RGB(0,0,0),55);
 	}
 		// 
 	return (!ctrl->IsTabDisabled(tab) ? 
-		PixelAlpha(::GetSysColor(COLOR_BTNSHADOW),RGB(0,0,0),55) :   // it is approximate color (VS2003 uses some another way).
+		MixingColors(::GetSysColor(COLOR_BTNSHADOW),RGB(0,0,0),55) :   // it is approximate color (VS2003 uses some another way).
 		TabCtrlStyle_base::GetTabTextColor(ctrl,tab));
 }
 // 
 COLORREF TabCtrlStyle_VS2003_base::GetButtonCloseColor(TabCtrl const *ctrl, bool hover, bool pushed)
 {	return (ctrl->GetSelectedTab() ?
-		PixelAlpha(::GetSysColor(COLOR_BTNSHADOW),RGB(0,0,0),55) :
+		MixingColors(::GetSysColor(COLOR_BTNSHADOW),RGB(0,0,0),55) :
 		TabCtrlStyle_base::GetButtonCloseColor(ctrl,hover,pushed));
 }
 COLORREF TabCtrlStyle_VS2003_base::GetButtonMenuColor(TabCtrl const * /*ctrl*/, bool /*hover*/, bool /*pushed*/)
-{	return PixelAlpha(::GetSysColor(COLOR_BTNSHADOW),RGB(0,0,0),55);
+{	return MixingColors(::GetSysColor(COLOR_BTNSHADOW),RGB(0,0,0),55);
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -4170,7 +4170,7 @@ COLORREF TabCtrlStyle_VS2008_bars_base::GetTabTextColor(TabCtrl const *ctrl, Tab
 		return TabCtrlStyle_base::GetTabTextColor(ctrl,tab);
 	if(ctrl->GetSelectedTab()==tab)   // selected.
 		return ::GetSysColor(COLOR_BTNTEXT);
-	return PixelAlpha(::GetSysColor(COLOR_BTNSHADOW),RGB(0,0,0),55);
+	return MixingColors(::GetSysColor(COLOR_BTNSHADOW),RGB(0,0,0),55);
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -4189,8 +4189,8 @@ COLORREF TabCtrlStyle_VS2008_bars_classic::GetTabGradientLightColor(TabCtrl cons
 // 
 COLORREF TabCtrlStyle_VS2008_bars_classic::GetTabGradientDarkColor(TabCtrl const * /*ctrl*/, bool hover, bool disable)
 {	return ((hover && !disable) ? 
-		PixelAlpha(::GetSysColor(COLOR_BTNSHADOW),RGB(255,255,255),75) :
-		PixelAlpha(::GetSysColor(COLOR_BTNSHADOW),RGB(255,255,255),55));
+		MixingColors(::GetSysColor(COLOR_BTNSHADOW),RGB(255,255,255),75) :
+		MixingColors(::GetSysColor(COLOR_BTNSHADOW),RGB(255,255,255),55));
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
@@ -4350,8 +4350,8 @@ COLORREF TabCtrlStyle_VS2008_bars_classic_custom1::GetTabGradientLightColor(TabC
 // 
 COLORREF TabCtrlStyle_VS2008_bars_classic_custom1::GetTabGradientDarkColor(TabCtrl const * /*ctrl*/, bool hover, bool disable)
 {	return ((hover && !disable) ? 
-		PixelAlpha(::GetSysColor(COLOR_BTNSHADOW),RGB(255,255,255),75) :
-		PixelAlpha(::GetSysColor(COLOR_BTNSHADOW),RGB(255,255,255),55));
+		MixingColors(::GetSysColor(COLOR_BTNSHADOW),RGB(255,255,255),75) :
+		MixingColors(::GetSysColor(COLOR_BTNSHADOW),RGB(255,255,255),55));
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

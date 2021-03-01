@@ -285,7 +285,7 @@ private:
 ///////////////////////////////////////
 protected:
 	DECLARE_MESSAGE_MAP()
-	BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD style, const RECT& rect, CWnd *parentWnd, UINT id, CCreateContext *context = nullptr) override;
+	BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD style, const RECT& rect, CWnd *parentWnd, UINT id, CCreateContext *context) override;
 	afx_msg void OnDestroy();
 	BOOL PreTranslateMessage(MSG *msg) override;
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -389,7 +389,7 @@ struct TabCtrlStyle_base :
 	void DrawRect(CDC *pDC, int x1, int y1, int x2, int y2, COLORREF clrLine);
 	void DrawRect(CDC *pDC, CRect const *rect, COLORREF clrLine);
 	void DrawRect(CDC *pDC, CRect const *rect);
-	COLORREF PixelAlpha(COLORREF src, COLORREF dst, int percent);
+	COLORREF MixingColors(COLORREF src, COLORREF dst, int percent);
 	void FillSolidRect(CDC *dc, CRect const *rc, COLORREF color);
 };
 /////////////////////////////////////////////////////////////////////////////
