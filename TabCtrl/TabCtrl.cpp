@@ -2078,40 +2078,40 @@ void TabCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 			// 
 		p.StopScrolling();
 		Invalidate(FALSE);
+			// 
+		bool alive = true;
+		p.m_pLifeStatus = &alive;
 		p.StopTabDragging(false);
 			// 
-		if(p.m_pNotifyManager)
-		{	bool alive = true;
-				// 
-			if(close)
-			{	CPoint pt(point);
-				ClientToScreen(&pt);
-					// 
-				p.m_pLifeStatus = &alive;
-				p.m_hPushedArea = Private::HANDLE_BUT_CLOSE;
-				p.m_pNotifyManager->OnCloseButtonClicked(this,&p.m_rcButtonClose,pt);
-					// 
-				if(alive)
-				{	p.m_hPushedArea = nullptr;
-					Invalidate(FALSE);
-					p.m_pLifeStatus = nullptr;
+		if(alive)
+			if(p.m_pNotifyManager)
+				if(close)
+				{	CPoint pt(point);
+					ClientToScreen(&pt);
+						// 
+					p.m_hPushedArea = Private::HANDLE_BUT_CLOSE;
+					p.m_pNotifyManager->OnCloseButtonClicked(this,&p.m_rcButtonClose,pt);
+						// 
+					if(alive)
+					{	p.m_hPushedArea = nullptr;
+						Invalidate(FALSE);
+					}
 				}
-			}
-			else if(menu)
-			{	CPoint pt(point);
-				ClientToScreen(&pt);
-					// 
-				p.m_pLifeStatus = &alive;
-				p.m_hPushedArea = Private::HANDLE_BUT_MENU;
-				p.m_pNotifyManager->OnMenuButtonClicked(this,&p.m_rcButtonMenu,pt);
-					// 
-				if(alive)
-				{	p.m_hPushedArea = nullptr;
-					Invalidate(FALSE);
-					p.m_pLifeStatus = nullptr;
+				else if(menu)
+				{	CPoint pt(point);
+					ClientToScreen(&pt);
+						// 
+					p.m_hPushedArea = Private::HANDLE_BUT_MENU;
+					p.m_pNotifyManager->OnMenuButtonClicked(this,&p.m_rcButtonMenu,pt);
+						// 
+					if(alive)
+					{	p.m_hPushedArea = nullptr;
+						Invalidate(FALSE);
+					}
 				}
-			}
-		}
+			//
+		if(alive)
+			p.m_pLifeStatus = nullptr;
 	}
 }
 /////////////////////////////////////////////////////////////////////////////
