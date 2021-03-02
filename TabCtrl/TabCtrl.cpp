@@ -2514,7 +2514,7 @@ bool TabCtrl::Private::CreateImageList(Gdiplus::Bitmap *bmp, int imageWidth,
 		if(bmpCnvrt)
 		{	if(bmpCnvrt->GetLastStatus()==Gdiplus::Ok)
 			{	Gdiplus::BitmapData data;
-				if(bmpCnvrt->LockBits(&rect,Gdiplus::ImageLockModeWrite,PixelFormat32bppARGB,&data)==Gdiplus::Ok)
+				if(bmpCnvrt->LockBits(&rect,Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeWrite,PixelFormat32bppARGB,&data)==Gdiplus::Ok)
 				{	CBitmap cbmp;
 					if( cbmp.CreateBitmap(rect.Width,rect.Height,1,32,nullptr) )
 					{	const UINT maskRGB = (clrMask & 0x0000ff00) | (clrMask & 0xff)<<16 | (clrMask & 0x00ff0000)>>16;
