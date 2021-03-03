@@ -75,8 +75,8 @@ public:
 		virtual void OnTabPostCreate(TabCtrl * /*ctrl*/, HTAB /*tab*/) {}
 		virtual void OnTabPreDestroy(TabCtrl const * /*ctrl*/, HTAB /*tab*/) {}
 			// 
-		virtual void OnCloseButtonClicked(TabCtrl * /*ctrl*/, CRect const * /*rect*/, CPoint /*ptScr*/) {}   // ptScr - in screen space.
-		virtual void OnMenuButtonClicked(TabCtrl * /*ctrl*/, CRect const * /*rect*/, CPoint /*ptScr*/) {}   // ptScr - in screen space.
+		virtual void OnButtonCloseClicked(TabCtrl * /*ctrl*/, CRect const * /*rect*/, CPoint /*ptScr*/) {}   // ptScr - in screen space.
+		virtual void OnButtonMenuClicked(TabCtrl * /*ctrl*/, CRect const * /*rect*/, CPoint /*ptScr*/) {}   // ptScr - in screen space.
 		virtual void OnTabSelected(TabCtrl * /*ctrl*/, HTAB /*tab*/) {}
 		virtual void OnLButtonDown(TabCtrl const * /*ctrl*/, HTAB /*tab*/, CPoint /*ptScr*/) {}   // ptScr - in screen space.
 		virtual void OnLButtonDblClk(TabCtrl * /*ctrl*/, HTAB /*tab*/, CPoint /*ptScr*/) {}   // ptScr - in screen space.

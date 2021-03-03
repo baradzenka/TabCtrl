@@ -265,11 +265,11 @@ void CMainFrame::OnShowClientEdgeBorder()
 /////////////////////////////////////////////////////////////////////////////
 // TabCtrlNotify.
 // 
-void CMainFrame::OnCloseButtonClicked(TabCtrl * /*ctrl*/, CRect const * /*rect*/, CPoint /*ptScr*/)
-{	::MessageBox(m_hWnd,_T("CMainFrame::OnCloseButtonClicked"),_T("CMainFrame"),MB_OK);
+void CMainFrame::OnButtonCloseClicked(TabCtrl * /*ctrl*/, CRect const * /*rect*/, CPoint /*ptScr*/)
+{	::MessageBox(m_hWnd,_T("CMainFrame::OnButtonCloseClicked"),_T("CMainFrame"),MB_OK);
 }
-void CMainFrame::OnMenuButtonClicked(TabCtrl * /*ctrl*/, CRect const * /*rect*/, CPoint /*ptScr*/)
-{	::MessageBox(m_hWnd,_T("CMainFrame::OnMenuButtonClicked"),_T("CMainFrame"),MB_OK);
+void CMainFrame::OnButtonMenuClicked(TabCtrl * /*ctrl*/, CRect const * /*rect*/, CPoint /*ptScr*/)
+{	::MessageBox(m_hWnd,_T("CMainFrame::OnButtonMenuClicked"),_T("CMainFrame"),MB_OK);
 }
 
 

@@ -472,7 +472,7 @@ void DemoDlg::EnableControl(int id, bool enable) const
 // TabCtrlNotify.
 /////////////////////////////////////////////////////////////////////////////
 // 
-void DemoDlg::OnCloseButtonClicked(TabCtrl *ctrl, CRect const * /*rect*/, CPoint /*ptScr*/)
+void DemoDlg::OnButtonCloseClicked(TabCtrl *ctrl, CRect const * /*rect*/, CPoint /*ptScr*/)
 {	TabCtrl::HTAB tab = ctrl->GetSelectedTab();   // get handle of current active tab (whose child window is visible).
 	if(tab)
 	{	ctrl->DeleteTab(tab);
@@ -481,7 +481,7 @@ void DemoDlg::OnCloseButtonClicked(TabCtrl *ctrl, CRect const * /*rect*/, CPoint
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
-void DemoDlg::OnMenuButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint /*ptScr*/)
+void DemoDlg::OnButtonMenuClicked(TabCtrl *ctrl, CRect const *rect, CPoint /*ptScr*/)
 {	CMenu menu;
 	if( menu.CreatePopupMenu() )
 	{	const int number = ctrl->GetNumberTabs();

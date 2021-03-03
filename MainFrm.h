@@ -9,8 +9,8 @@ class CMainFrame : public CFrameWnd,
 	DECLARE_DYNAMIC(CMainFrame)
 
 private: // TabCtrlNotify.
-	void OnCloseButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr) override;
-	void OnMenuButtonClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr) override;
+	void OnButtonCloseClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr) override;
+	void OnButtonMenuClicked(TabCtrl *ctrl, CRect const *rect, CPoint ptScr) override;
 
 protected:   // control bar embedded members
 	CStatusBar  m_wndStatusBar;

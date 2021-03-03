@@ -2090,7 +2090,7 @@ void TabCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 					ClientToScreen(&pt);
 						// 
 					p.m_hPushedArea = Private::HANDLE_BUT_CLOSE;
-					p.m_pNotifyManager->OnCloseButtonClicked(this,&p.m_rcButtonClose,pt);
+					p.m_pNotifyManager->OnButtonCloseClicked(this,&p.m_rcButtonClose,pt);
 						// 
 					if(alive)
 					{	p.m_hPushedArea = nullptr;
@@ -2102,7 +2102,7 @@ void TabCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 					ClientToScreen(&pt);
 						// 
 					p.m_hPushedArea = Private::HANDLE_BUT_MENU;
-					p.m_pNotifyManager->OnMenuButtonClicked(this,&p.m_rcButtonMenu,pt);
+					p.m_pNotifyManager->OnButtonMenuClicked(this,&p.m_rcButtonMenu,pt);
 						// 
 					if(alive)
 					{	p.m_hPushedArea = nullptr;
