@@ -237,7 +237,7 @@ public:
 	bool m_bWatchActivityCtrl;
 
 public:
-	struct Tab : _HTAB
+	struct Tab : HTAB__
 	{	HWND wnd;
 		int image;
 		CString text, tooltipText;

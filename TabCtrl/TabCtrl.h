@@ -24,7 +24,7 @@ class TabCtrl : public CWnd
 // PUBLIC
 ///////////////////////////////////////
 public:
-	typedef struct _HTAB {} const *HTAB;
+	typedef struct HTAB__ {} const *HTAB;
 
 public:
 	struct Draw
