@@ -134,7 +134,7 @@ public:
 	void SetSystemImagesRef(Gdiplus::Bitmap *bmp, int imageWidth, COLORREF clrTransp=CLR_NONE);   // set reference to another ImageList.
 	Gdiplus::Bitmap *GetSystemImages() const;
 	bool GetSystemImageList(COLORREF clrDstBack/*or CLR_NONE*/, CImageList *imageList/*out*/) const;
-	CSize GetSystemImagesSize() const;
+	CSize GetSystemImageSize() const;
 	COLORREF GetSystemImagesTranspColor() const;
 		// 
 	bool CreateImages(HMODULE moduleRes/*or null*/, UINT resNormalID/*or 0*/, UINT resDisableID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp=CLR_NONE);

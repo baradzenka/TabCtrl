@@ -738,7 +738,7 @@ bool TabCtrl::GetSystemImageList(COLORREF clrDstBack/*or CLR_NONE*/, CImageList 
 	return p.m_ImageSys.bmpRef && p.CreateImageList(p.m_ImageSys.bmpRef, p.m_ImageSys.size.cx, p.m_clrImageSysTransp, clrDstBack, imageList/*out*/);
 }
 // 
-CSize TabCtrl::GetSystemImagesSize() const
+CSize TabCtrl::GetSystemImageSize() const
 {	return p.m_ImageSys.size;
 }
 // 
