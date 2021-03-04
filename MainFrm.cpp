@@ -50,8 +50,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_TabCtrl.SetNotifyManager(this);
 	m_TabCtrl.SetBehavior(TabCtrl::BehaviorScroll);
 		// 
-	if( !m_TabCtrl.CreateSystemImage(NULL,IDB_IMAGES_SYSTEM,true,14) ||
-		!m_TabCtrl.CreateImage(NULL,IDB_IMAGES_TAB_NORMAL,IDB_IMAGES_TAB_DISABLE,true,16) )
+	if( !m_TabCtrl.CreateSystemImages(NULL,IDB_IMAGES_SYSTEM,true,14) ||
+		!m_TabCtrl.CreateImages(NULL,IDB_IMAGES_TAB_NORMAL,IDB_IMAGES_TAB_DISABLE,true,16) )
 		return -1;
 		// 
 		// Creation of child windows.

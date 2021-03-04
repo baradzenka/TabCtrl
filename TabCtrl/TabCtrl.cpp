@@ -694,7 +694,7 @@ TabCtrl::Behavior TabCtrl::GetBehavior() const
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-bool TabCtrl::CreateSystemImage(HMODULE moduleRes/*or null*/, UINT resID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
+bool TabCtrl::CreateSystemImages(HMODULE moduleRes/*or null*/, UINT resID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
 {	assert(!resID || imageWidth>0);
 		// 
 	if(p.m_ImageSys.bmp)
@@ -713,7 +713,7 @@ bool TabCtrl::CreateSystemImage(HMODULE moduleRes/*or null*/, UINT resID/*or 0*/
 	return res;
 }
 // 
-void TabCtrl::SetSystemImageRef(Gdiplus::Bitmap *bmp, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
+void TabCtrl::SetSystemImagesRef(Gdiplus::Bitmap *bmp, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
 {	assert(!bmp || imageWidth>0);
 		// 
 	if(p.m_ImageSys.bmp)
@@ -728,7 +728,7 @@ void TabCtrl::SetSystemImageRef(Gdiplus::Bitmap *bmp, int imageWidth, COLORREF c
 	p.m_clrImageSysTransp = clrTransp;
 }
 //
-Gdiplus::Bitmap *TabCtrl::GetSystemImage() const
+Gdiplus::Bitmap *TabCtrl::GetSystemImages() const
 {	return p.m_ImageSys.bmpRef;
 }
 // 
@@ -738,17 +738,17 @@ bool TabCtrl::GetSystemImageList(COLORREF clrDstBack/*or CLR_NONE*/, CImageList 
 	return p.m_ImageSys.bmpRef && p.CreateImageList(p.m_ImageSys.bmpRef, p.m_ImageSys.size.cx, p.m_clrImageSysTransp, clrDstBack, imageList/*out*/);
 }
 // 
-CSize TabCtrl::GetSystemImageSize() const
+CSize TabCtrl::GetSystemImagesSize() const
 {	return p.m_ImageSys.size;
 }
 // 
-COLORREF TabCtrl::GetSystemImageTranspColor() const
+COLORREF TabCtrl::GetSystemImagesTranspColor() const
 {	return p.m_clrImageSysTransp;
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
-bool TabCtrl::CreateImage(HMODULE moduleRes/*or null*/, UINT resNormalID/*or 0*/, UINT resDisableID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
+bool TabCtrl::CreateImages(HMODULE moduleRes/*or null*/, UINT resNormalID/*or 0*/, UINT resDisableID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
 {	assert((!resNormalID && !resDisableID) || imageWidth>0);
 		// 
 	if(p.m_ImageNormal.bmp)
@@ -781,7 +781,7 @@ bool TabCtrl::CreateImage(HMODULE moduleRes/*or null*/, UINT resNormalID/*or 0*/
 	return res;
 }
 //
-void TabCtrl::SetImageRef(Gdiplus::Bitmap *bmpNormal/*or 0*/, Gdiplus::Bitmap *bmpDisable/*or 0*/, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
+void TabCtrl::SetImagesRef(Gdiplus::Bitmap *bmpNormal/*or 0*/, Gdiplus::Bitmap *bmpDisable/*or 0*/, int imageWidth, COLORREF clrTransp/*=CLR_NONE*/)
 {	assert((!bmpNormal && !bmpDisable) || imageWidth>0);
 		// 
 	if(p.m_ImageNormal.bmp)
@@ -805,7 +805,7 @@ void TabCtrl::SetImageRef(Gdiplus::Bitmap *bmpNormal/*or 0*/, Gdiplus::Bitmap *b
 	p.m_clrImageTransp = clrTransp;
 }
 //
-void TabCtrl::GetImage(Gdiplus::Bitmap **normal/*out,or null*/, Gdiplus::Bitmap **disable/*out,or null*/) const
+void TabCtrl::GetImages(Gdiplus::Bitmap **normal/*out,or null*/, Gdiplus::Bitmap **disable/*out,or null*/) const
 {	if(normal)
 		*normal = p.m_ImageNormal.bmpRef;
 	if(disable)
@@ -833,7 +833,7 @@ void TabCtrl::GetImageSize(CSize *szNormal/*out,or null*/, CSize *szDisable/*out
 	}
 }
 //
-COLORREF TabCtrl::GetImageTranspColor() const
+COLORREF TabCtrl::GetImagesTranspColor() const
 {	return p.m_clrImageTransp;
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -2632,7 +2632,7 @@ void TabCtrlStyle_base::DrawTabContext(TabCtrl const *ctrl, CDC *dc, TabCtrl::HT
 	const int textWidth = dc->GetTextExtent(text).cx;
 		// 
 	Gdiplus::Bitmap *images;
-	(!disable ? ctrl->GetImage(&images/*out*/,nullptr) : ctrl->GetImage(nullptr,&images/*out*/));
+	(!disable ? ctrl->GetImages(&images/*out*/,nullptr) : ctrl->GetImages(nullptr,&images/*out*/));
 		// 
 		// draw image.
 	if(ctrl->GetTabImage(tab)>-1 && images)
@@ -2695,16 +2695,16 @@ void TabCtrlStyle_base::DrawTabImage(TabCtrl const *ctrl, CDC *dc, TabCtrl::HTAB
 	CSize szImage;
 		// 
 	if( !ctrl->IsTabDisabled(tab) )
-	{	ctrl->GetImage(&images/*out*/,nullptr);
+	{	ctrl->GetImages(&images/*out*/,nullptr);
 		ctrl->GetImageSize(&szImage/*out*/,nullptr);
 	}
 	else
-	{	ctrl->GetImage(nullptr,&images/*out*/);
+	{	ctrl->GetImages(nullptr,&images/*out*/);
 		ctrl->GetImageSize(nullptr,&szImage/*out*/);
 	}
 	const CPoint pt(rect->left,(rect->top+rect->bottom-szImage.cy+1)/2);
 	const int image = ctrl->GetTabImage(tab);
-	DrawImage(ctrl,dc,images,pt, image, szImage, ctrl->GetImageTranspColor());
+	DrawImage(ctrl,dc,images,pt, image, szImage, ctrl->GetImagesTranspColor());
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
@@ -2730,8 +2730,8 @@ void TabCtrlStyle_base::DrawButtonFrame(TabCtrl const * /*ctrl*/, CDC *dc, CRect
 void TabCtrlStyle_base::DrawButtonClose(TabCtrl const *ctrl, CDC *dc, CRect const *rect, bool hover, bool pushed)
 {	DrawButtonFrame(ctrl,dc,rect,hover,pushed);
 		// 
-	Gdiplus::Bitmap *images = ctrl->GetSystemImage();
-	const COLORREF clrTransp = ctrl->GetSystemImageTranspColor();
+	Gdiplus::Bitmap *images = ctrl->GetSystemImages();
+	const COLORREF clrTransp = ctrl->GetSystemImagesTranspColor();
 	DrawMarker(ctrl, dc, images, rect, TabCtrl::SysImageButtonClose, clrTransp, GetButtonCloseColor(ctrl,hover,pushed));
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -2739,8 +2739,8 @@ void TabCtrlStyle_base::DrawButtonClose(TabCtrl const *ctrl, CDC *dc, CRect cons
 void TabCtrlStyle_base::DrawButtonMenu(TabCtrl const *ctrl, CDC *dc, CRect const *rect, bool hover, bool pushed, bool partialView)
 {	DrawButtonFrame(ctrl,dc,rect,hover,pushed);
 		// 
-	Gdiplus::Bitmap *images = ctrl->GetSystemImage();
-	const COLORREF clrTransp = ctrl->GetSystemImageTranspColor();
+	Gdiplus::Bitmap *images = ctrl->GetSystemImages();
+	const COLORREF clrTransp = ctrl->GetSystemImagesTranspColor();
 	DrawMarker(ctrl, dc, images, rect, (!partialView ? TabCtrl::SysImageButtonMenuFullView : TabCtrl::SysImageButtonMenuPartialView),
 		clrTransp, GetButtonMenuColor(ctrl,hover,pushed));
 }
@@ -2749,8 +2749,8 @@ void TabCtrlStyle_base::DrawButtonMenu(TabCtrl const *ctrl, CDC *dc, CRect const
 void TabCtrlStyle_base::DrawButtonScrollLeft(TabCtrl const *ctrl, CDC *dc, CRect const *rect, bool hover, bool pushed, bool partialView)
 {	DrawButtonFrame(ctrl,dc,rect,hover,pushed);
 		// 
-	Gdiplus::Bitmap *images = ctrl->GetSystemImage();
-	const COLORREF clrTransp = ctrl->GetSystemImageTranspColor();
+	Gdiplus::Bitmap *images = ctrl->GetSystemImages();
+	const COLORREF clrTransp = ctrl->GetSystemImagesTranspColor();
 	DrawMarker(ctrl, dc, images, rect, (!partialView ? TabCtrl::SysImageButtonScrollLeftForbid : TabCtrl::SysImageButtonScrollLeftAllow),
 		clrTransp, GetButtonScrollLeftColor(ctrl,hover,pushed));
 }
@@ -2759,8 +2759,8 @@ void TabCtrlStyle_base::DrawButtonScrollLeft(TabCtrl const *ctrl, CDC *dc, CRect
 void TabCtrlStyle_base::DrawButtonScrollRight(TabCtrl const *ctrl, CDC *dc, CRect const *rect, bool hover, bool pushed, bool partialView)
 {	DrawButtonFrame(ctrl,dc,rect,hover,pushed);
 		// 
-	Gdiplus::Bitmap *images = ctrl->GetSystemImage();
-	const COLORREF clrTransp = ctrl->GetSystemImageTranspColor();
+	Gdiplus::Bitmap *images = ctrl->GetSystemImages();
+	const COLORREF clrTransp = ctrl->GetSystemImagesTranspColor();
 	DrawMarker(ctrl, dc, images, rect, (!partialView ? TabCtrl::SysImageButtonScrollRightForbid : TabCtrl::SysImageButtonScrollRightAllow),
 		clrTransp, GetButtonScrollRightColor(ctrl,hover,pushed));
 }
@@ -3013,8 +3013,8 @@ void TabCtrlStyle_VS2003_base::DrawButtonClose(TabCtrl const *ctrl, CDC *dc, CRe
 	if(hover && pushed)
 		rc.OffsetRect(1,1);
 		// 
-	Gdiplus::Bitmap *images = ctrl->GetSystemImage();
-	const COLORREF clrTransp = ctrl->GetSystemImageTranspColor();
+	Gdiplus::Bitmap *images = ctrl->GetSystemImages();
+	const COLORREF clrTransp = ctrl->GetSystemImagesTranspColor();
 	DrawMarker(ctrl, dc, images, &rc, TabCtrl::SysImageButtonClose, clrTransp, GetButtonCloseColor(ctrl,hover,pushed));
 }
 // 
@@ -3025,8 +3025,8 @@ void TabCtrlStyle_VS2003_base::DrawButtonMenu(TabCtrl const *ctrl, CDC *dc, CRec
 	if(hover && pushed)
 		rc.OffsetRect(1,1);
 		// 
-	Gdiplus::Bitmap *images = ctrl->GetSystemImage();
-	const COLORREF clrTransp = ctrl->GetSystemImageTranspColor();
+	Gdiplus::Bitmap *images = ctrl->GetSystemImages();
+	const COLORREF clrTransp = ctrl->GetSystemImagesTranspColor();
 	DrawMarker(ctrl, dc, images, &rc, (!partialView ? TabCtrl::SysImageButtonMenuFullView : TabCtrl::SysImageButtonMenuPartialView),
 		clrTransp, GetButtonMenuColor(ctrl,hover,pushed));
 }
@@ -3038,8 +3038,8 @@ void TabCtrlStyle_VS2003_base::DrawButtonScrollLeft(TabCtrl const *ctrl, CDC *dc
 	if(hover && pushed)
 		rc.OffsetRect(1,1);
 		// 
-	Gdiplus::Bitmap *images = ctrl->GetSystemImage();
-	const COLORREF clrTransp = ctrl->GetSystemImageTranspColor();
+	Gdiplus::Bitmap *images = ctrl->GetSystemImages();
+	const COLORREF clrTransp = ctrl->GetSystemImagesTranspColor();
 	DrawMarker(ctrl, dc, images, &rc, (!partialView ? TabCtrl::SysImageButtonScrollLeftForbid : TabCtrl::SysImageButtonScrollLeftAllow),
 		clrTransp, GetButtonScrollLeftColor(ctrl,hover,pushed) );
 }
@@ -3051,8 +3051,8 @@ void TabCtrlStyle_VS2003_base::DrawButtonScrollRight(TabCtrl const *ctrl, CDC *d
 	if(hover && pushed)
 		rc.OffsetRect(1,1);
 		// 
-	Gdiplus::Bitmap *images = ctrl->GetSystemImage();
-	const COLORREF clrTransp = ctrl->GetSystemImageTranspColor();
+	Gdiplus::Bitmap *images = ctrl->GetSystemImages();
+	const COLORREF clrTransp = ctrl->GetSystemImagesTranspColor();
 	DrawMarker(ctrl, dc, images, &rc, (!partialView ? TabCtrl::SysImageButtonScrollRightForbid : TabCtrl::SysImageButtonScrollRightAllow),
 		clrTransp, GetButtonScrollRightColor(ctrl,hover,pushed) );
 }
@@ -4439,7 +4439,7 @@ void TabCtrlStyle_VS2008_bars_olive_custom1::DrawButtonFrame(TabCtrl const * /*c
 /////////////////////////////////////////////////////////////////////////////
 // 
 int TabCtrlStyle_VS2010_client::GetBorderWidth(TabCtrl const * /*ctrl*/, TabCtrl::IRecalc * /*base*/)
-{	return 0;
+{	return 1;
 }
 // 
 CRect TabCtrlStyle_VS2010_client::GetControlAreaPadding(TabCtrl const * /*ctrl*/, TabCtrl::IRecalc * /*base*/)
@@ -4709,6 +4709,10 @@ void TabCtrlStyle_VS2010_client::DrawButtonFrame(TabCtrl const * /*ctrl*/, CDC *
 	}
 }
 /////////////////////////////////////////////////////////////////////////////
+//
+COLORREF TabCtrlStyle_VS2010_client::GetBorderColor(TabCtrl const * /*ctrl*/)
+{	return RGB(46,64,94);
+}
 // 
 COLORREF TabCtrlStyle_VS2010_client::GetCtrlAreaBackColor(TabCtrl const * /*ctrl*/)
 {	return RGB(46,64,94);
@@ -4784,7 +4788,7 @@ void TabCtrlStyle_VS2010_client_custom2::DrawWindowsAreaBack(TabCtrl const *ctrl
 /////////////////////////////////////////////////////////////////////////////
 // 
 int TabCtrlStyle_VS2010_bars::GetBorderWidth(TabCtrl const * /*ctrl*/, TabCtrl::IRecalc * /*base*/)
-{	return 0;
+{	return 1;
 }
 // 
 CRect TabCtrlStyle_VS2010_bars::GetControlAreaPadding(TabCtrl const * /*ctrl*/, TabCtrl::IRecalc * /*base*/)
@@ -4901,6 +4905,10 @@ void TabCtrlStyle_VS2010_bars::DrawButtonFrame(TabCtrl const * /*ctrl*/, CDC *dc
 	}
 }
 /////////////////////////////////////////////////////////////////////////////
+//
+COLORREF TabCtrlStyle_VS2010_bars::GetBorderColor(TabCtrl const * /*ctrl*/)
+{	return RGB(46,64,94);
+}
 // 
 COLORREF TabCtrlStyle_VS2010_bars::GetCtrlAreaBackColor(TabCtrl const * /*ctrl*/)
 {	return RGB(46,64,94);
@@ -5120,6 +5128,10 @@ COLORREF TabCtrlStyle_VS2019_client_dark::GetButtonFrameHighlightBackColor(TabCt
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
+int TabCtrlStyle_VS2019_client_blue::GetBorderWidth(TabCtrl const * /*ctrl*/, IRecalc * /*base*/)
+{	return 1;
+}
+//
 CRect TabCtrlStyle_VS2019_client_blue::GetControlAreaPadding(TabCtrl const *ctrl, IRecalc * /*base*/)
 {	return (ctrl->GetLayout()==TabCtrl::LayoutTop ? CRect(0,0,0,2) : CRect(0,2,0,0));
 }
@@ -5136,6 +5148,10 @@ void TabCtrlStyle_VS2019_client_blue::DrawWindowsAreaBack(TabCtrl const *ctrl, C
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
+//
+COLORREF TabCtrlStyle_VS2019_client_blue::GetBorderColor(TabCtrl const * /*ctrl*/)
+{	return RGB(93,107,153);
+}
 //
 COLORREF TabCtrlStyle_VS2019_client_blue::GetCtrlAreaBackColor(TabCtrl const * /*ctrl*/)
 {	return RGB(93,107,153);
@@ -5215,7 +5231,7 @@ CRect TabCtrlStyle_VS2019_bars_base::GetWindowsAreaPadding(TabCtrl const *ctrl, 
 //
 CRect TabCtrlStyle_VS2019_bars_base::GetTabPadding(TabCtrl const *ctrl, IRecalc * /*base*/)
 {	Gdiplus::Bitmap *normal, *disable;
-	ctrl->GetImage(&normal/*out*/,&disable/*out*/);
+	ctrl->GetImages(&normal/*out*/,&disable/*out*/);
 	return (normal || disable ? CRect(6,3,5,3) : CRect(6,4,5,4));
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -5410,6 +5426,10 @@ COLORREF TabCtrlStyle_VS2019_bars_dark::GetButtonFrameBackColorB(TabCtrl const *
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 //
+int TabCtrlStyle_VS2019_bars_blue::GetBorderWidth(TabCtrl const * /*ctrl*/, IRecalc * /*base*/)
+{	return 1;
+}
+//
 CRect TabCtrlStyle_VS2019_bars_blue::GetControlAreaPadding(TabCtrl const * /*ctrl*/, IRecalc * /*base*/)
 {	return CRect(0,0,0,0);
 }
@@ -5420,7 +5440,7 @@ CRect TabCtrlStyle_VS2019_bars_blue::GetWindowsAreaPadding(TabCtrl const * /*ctr
 // 
 CRect TabCtrlStyle_VS2019_bars_blue::GetTabPadding(TabCtrl const *ctrl, IRecalc * /*base*/)
 {	Gdiplus::Bitmap *normal, *disable;
-	ctrl->GetImage(&normal/*out*/,&disable/*out*/);
+	ctrl->GetImages(&normal/*out*/,&disable/*out*/);
 	if(normal || disable)
 		return CRect(6,3,5,3);
 	return (ctrl->GetLayout()==TabCtrl::LayoutTop ? CRect(6,4,5,3) : CRect(6,3,5,4));
@@ -5439,6 +5459,10 @@ void TabCtrlStyle_VS2019_bars_blue::DrawWindowsAreaBack(TabCtrl const *ctrl, CDC
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
+//
+COLORREF TabCtrlStyle_VS2019_bars_blue::GetBorderColor(TabCtrl const * /*ctrl*/)
+{	return RGB(93,107,153);
+}
 //
 COLORREF TabCtrlStyle_VS2019_bars_blue::GetCtrlAreaBackColor(TabCtrl const * /*ctrl*/)
 {	return RGB(93,107,153);

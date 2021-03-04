@@ -130,19 +130,19 @@ public:
 		SysImageButtonScrollLeftAllow, SysImageButtonScrollLeftForbid,
 		SysImageButtonScrollRightAllow, SysImageButtonScrollRightForbid
 	};
-	bool CreateSystemImage(HMODULE moduleRes/*or null*/, UINT resID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp=CLR_NONE);   // system images must have the same order as SysImage enum.
-	void SetSystemImageRef(Gdiplus::Bitmap *bmp, int imageWidth, COLORREF clrTransp=CLR_NONE);   // set reference to another ImageList.
-	Gdiplus::Bitmap *GetSystemImage() const;
+	bool CreateSystemImages(HMODULE moduleRes/*or null*/, UINT resID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp=CLR_NONE);   // system images must have the same order as SysImage enum.
+	void SetSystemImagesRef(Gdiplus::Bitmap *bmp, int imageWidth, COLORREF clrTransp=CLR_NONE);   // set reference to another ImageList.
+	Gdiplus::Bitmap *GetSystemImages() const;
 	bool GetSystemImageList(COLORREF clrDstBack/*or CLR_NONE*/, CImageList *imageList/*out*/) const;
-	CSize GetSystemImageSize() const;
-	COLORREF GetSystemImageTranspColor() const;
+	CSize GetSystemImagesSize() const;
+	COLORREF GetSystemImagesTranspColor() const;
 		// 
-	bool CreateImage(HMODULE moduleRes/*or null*/, UINT resNormalID/*or 0*/, UINT resDisableID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp=CLR_NONE);
-	void SetImageRef(Gdiplus::Bitmap *bmpNormal/*or 0*/, Gdiplus::Bitmap *bmpDisable/*or 0*/, int imageWidth, COLORREF clrTransp=CLR_NONE);   // set reference to another ImageList.
-	void GetImage(Gdiplus::Bitmap **normal/*out,or null*/, Gdiplus::Bitmap **disable/*out,or null*/) const;
+	bool CreateImages(HMODULE moduleRes/*or null*/, UINT resNormalID/*or 0*/, UINT resDisableID/*or 0*/, bool pngImage, int imageWidth, COLORREF clrTransp=CLR_NONE);
+	void SetImagesRef(Gdiplus::Bitmap *bmpNormal/*or 0*/, Gdiplus::Bitmap *bmpDisable/*or 0*/, int imageWidth, COLORREF clrTransp=CLR_NONE);   // set reference to another ImageList.
+	void GetImages(Gdiplus::Bitmap **normal/*out,or null*/, Gdiplus::Bitmap **disable/*out,or null*/) const;
 	bool GetImageList(COLORREF clrDstBack/*or CLR_NONE*/, CImageList *normal/*out,or null*/, CImageList *disable/*out,or null*/) const;
 	void GetImageSize(CSize *szNormal/*out,or null*/, CSize *szDisable/*out,or null*/) const;
-	COLORREF GetImageTranspColor() const;
+	COLORREF GetImagesTranspColor() const;
 		// 
 	bool SetCursor(UINT resID);
 	bool SetCursor(HMODULE module/*or null*/, UINT resID);
@@ -659,6 +659,7 @@ struct TabCtrlStyle_VS2010_client : TabCtrlStyle_base
 	void DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect) override;
 
 		// TabCtrlStyle_base.
+	COLORREF GetBorderColor(TabCtrl const *ctrl) override;
 	COLORREF GetCtrlAreaBackColor(TabCtrl const *ctrl) override;
 	COLORREF GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab) override;
 	COLORREF GetEmptyWndsAreaBackColor(TabCtrl const *ctrl) override;
@@ -696,6 +697,7 @@ struct TabCtrlStyle_VS2010_bars : TabCtrlStyle_base
 	void DrawControlAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect) override;
 
 		// TabCtrlStyle_base.
+	COLORREF GetBorderColor(TabCtrl const *ctrl) override;
 	COLORREF GetCtrlAreaBackColor(TabCtrl const *ctrl) override;
 	COLORREF GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab) override;
 	COLORREF GetEmptyWndsAreaBackColor(TabCtrl const *ctrl) override;
@@ -764,6 +766,7 @@ struct TabCtrlStyle_VS2019_client_dark : TabCtrlStyle_VS2019_client_base
 // 
 struct TabCtrlStyle_VS2019_client_blue : TabCtrlStyle_VS2019_client_base
 {		// TabCtrl::IRecalc.
+	int GetBorderWidth(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetControlAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetWindowsAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 
@@ -771,6 +774,7 @@ struct TabCtrlStyle_VS2019_client_blue : TabCtrlStyle_VS2019_client_base
 	void DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect) override;
 
 		// TabCtrlStyle_base.
+	COLORREF GetBorderColor(TabCtrl const *ctrl) override;
 	COLORREF GetCtrlAreaBackColor(TabCtrl const *ctrl) override;
 	COLORREF GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab) override;
 	COLORREF GetButtonCloseColor(TabCtrl const *ctrl, bool hover, bool pushed) override;
@@ -842,6 +846,7 @@ struct TabCtrlStyle_VS2019_bars_dark : TabCtrlStyle_VS2019_bars_base
 // 
 struct TabCtrlStyle_VS2019_bars_blue : TabCtrlStyle_VS2019_bars_base
 {		// TabCtrl::IRecalc.
+	int GetBorderWidth(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetControlAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetWindowsAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetTabPadding(TabCtrl const *ctrl, IRecalc *base) override;
@@ -851,6 +856,7 @@ struct TabCtrlStyle_VS2019_bars_blue : TabCtrlStyle_VS2019_bars_base
 	void DrawWindowsAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect) override;
 
 		// TabCtrlStyle_base.
+	COLORREF GetBorderColor(TabCtrl const *ctrl) override;
 	COLORREF GetCtrlAreaBackColor(TabCtrl const *ctrl) override;
 	COLORREF GetTabSelectedBackColor(TabCtrl const *ctrl) override;
 	COLORREF GetTabTextColor(TabCtrl const *ctrl, TabCtrl::HTAB tab) override;

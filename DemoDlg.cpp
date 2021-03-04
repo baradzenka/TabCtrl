@@ -117,8 +117,8 @@ BOOL DemoDlg::OnInitDialog()
 	m_Edit2.SetWindowText(_T("Notes"));
 		// 
 		// 
-	m_TabCtrl.CreateSystemImage(NULL,IDB_IMAGES_SYSTEM,true,14);
-	m_TabCtrl.CreateImage(NULL,IDB_IMAGES_TAB_NORMAL,IDB_IMAGES_TAB_DISABLE,true,16);
+	m_TabCtrl.CreateSystemImages(NULL,IDB_IMAGES_SYSTEM,true,14);
+	m_TabCtrl.CreateImages(NULL,IDB_IMAGES_TAB_NORMAL,IDB_IMAGES_TAB_DISABLE,true,16);
 		// 
 	CFont font;
 	font.CreatePointFont(85,_T("Tahoma"));
@@ -178,7 +178,7 @@ BOOL DemoDlg::OnInitDialog()
 	SetButtonCheck(IDC_BUT31, m_TabCtrl.IsBorderVisible() );
 		// 
 	Gdiplus::Bitmap *imageNormal, *imageDisable;
-	m_TabCtrl.GetImage(&imageNormal/*out*/,&imageDisable/*out*/);
+	m_TabCtrl.GetImages(&imageNormal/*out*/,&imageDisable/*out*/);
 	SetButtonCheck(IDC_BUT33,imageNormal || imageDisable);
 		// 
 	SetButtonCheck(IDC_BUT41, m_TabCtrl.IsWatchCtrlActivity() );
@@ -336,8 +336,8 @@ void DemoDlg::OnBnClickedBut32()
 // Show images.
 void DemoDlg::OnBnClickedBut33()
 {	(GetButtonCheck(IDC_BUT33) ?
-		m_TabCtrl.CreateImage(NULL,IDB_IMAGES_TAB_NORMAL,IDB_IMAGES_TAB_DISABLE,true,16) :
-		m_TabCtrl.CreateImage(NULL, 0,0, false,0, 0));
+		m_TabCtrl.CreateImages(NULL,IDB_IMAGES_TAB_NORMAL,IDB_IMAGES_TAB_DISABLE,true,16) :
+		m_TabCtrl.CreateImages(NULL, 0,0, false,0, 0));
 	m_TabCtrl.Update();
 }
 /////////////////////////////////////////////////////////////////////////////
