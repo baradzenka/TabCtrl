@@ -416,7 +416,7 @@ bool TabCtrl::Create(CWnd *parent, DWORD style, RECT const &rect, UINT id)
 	p.m_pLifeStatus = nullptr;
 		// 
 	const CString classname = AfxRegisterWndClass(CS_DBLCLKS,::LoadCursor(nullptr,IDC_ARROW),nullptr,nullptr);
-	if(CWnd::Create(classname,_T(""),style | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,rect,parent,id)==FALSE)
+	if( !CWnd::Create(classname,_T(""),style | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,rect,parent,id) )
 		return false;
 		// 
 	CFont *font = CFont::FromHandle( static_cast<HFONT>(::GetStockObject(DEFAULT_GUI_FONT)) );

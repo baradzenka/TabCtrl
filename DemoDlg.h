@@ -69,7 +69,6 @@ private:
 	TabDialog m_Dlg1;
 		// 
 	bool m_bDelDragOutside;
-	CRect m_rcInit;
 
 private:
 	void SetTabCtrlPos();

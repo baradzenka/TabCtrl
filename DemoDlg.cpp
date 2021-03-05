@@ -96,10 +96,8 @@ int DemoDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 BOOL DemoDlg::OnInitDialog()
 {	CDialog::OnInitDialog();
 		// 
-	GetDlgItem(IDC_TABCTRL_BASE)->GetWindowRect(&m_rcInit/*out*/);
-	ScreenToClient(&m_rcInit);
-	SetTabCtrlPos();
 	GetDlgItem(IDC_TABCTRL_BASE)->ShowWindow(SW_HIDE);
+	SetTabCtrlPos();
 		// 
 		// 
 	for(int i=0; i<6; ++i)
@@ -117,8 +115,8 @@ BOOL DemoDlg::OnInitDialog()
 	m_Edit2.SetWindowText(_T("Notes"));
 		// 
 		// 
-	m_TabCtrl.CreateSystemImages(NULL,IDB_IMAGES_SYSTEM,true,14);
-	m_TabCtrl.CreateImages(NULL,IDB_IMAGES_TAB_NORMAL,IDB_IMAGES_TAB_DISABLE,true,16);
+	m_TabCtrl.CreateSystemImages(nullptr,IDB_IMAGES_SYSTEM,true,14);
+	m_TabCtrl.CreateImages(nullptr,IDB_IMAGES_TAB_NORMAL,IDB_IMAGES_TAB_DISABLE,true,16);
 		// 
 	CFont font;
 	font.CreatePointFont(85,_T("Tahoma"));
@@ -169,7 +167,7 @@ BOOL DemoDlg::OnInitDialog()
 	SetButtonCheck(IDC_BUT12, m_TabCtrl.GetLayout()==TabCtrl::LayoutBottom );
 	SetButtonCheck(IDC_BUT13, m_TabCtrl.GetBehavior()==TabCtrl::BehaviorScale );
 	SetButtonCheck(IDC_BUT14, m_TabCtrl.GetBehavior()==TabCtrl::BehaviorScroll );
-	SetButtonCheck(IDC_BUT21, m_TabCtrl.GetCursor()!=NULL );
+	SetButtonCheck(IDC_BUT21, m_TabCtrl.GetCursor()!=nullptr );
 	SetButtonCheck(IDC_BUT22, m_TabCtrl.IsEqualTabsSize() );
 	SetButtonCheck(IDC_BUT23, m_TabCtrl.IsHideSingleTab() );
 	SetButtonCheck(IDC_BUT24, m_TabCtrl.IsTabRemoveEnable() );
@@ -322,22 +320,22 @@ void DemoDlg::OnBnClickedBut32()
 		m_Dlg1.ModifyStyle(WS_BORDER,0);
 	}
 		// 
-	m_List1.SetWindowPos(NULL,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-	m_List2.SetWindowPos(NULL,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-	m_List3.SetWindowPos(NULL,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-	m_Tree1.SetWindowPos(NULL,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-	m_Tree2.SetWindowPos(NULL,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-	m_Tree3.SetWindowPos(NULL,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-	m_Edit1.SetWindowPos(NULL,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-	m_Edit2.SetWindowPos(NULL,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
-	m_Dlg1.SetWindowPos(NULL,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	m_List1.SetWindowPos(nullptr,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	m_List2.SetWindowPos(nullptr,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	m_List3.SetWindowPos(nullptr,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	m_Tree1.SetWindowPos(nullptr,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	m_Tree2.SetWindowPos(nullptr,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	m_Tree3.SetWindowPos(nullptr,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	m_Edit1.SetWindowPos(nullptr,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	m_Edit2.SetWindowPos(nullptr,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+	m_Dlg1.SetWindowPos(nullptr,0,0,0,0,SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
 }
 /////////////////////////////////////////////////////////////////////////////
 // Show images.
 void DemoDlg::OnBnClickedBut33()
 {	(GetButtonCheck(IDC_BUT33) ?
-		m_TabCtrl.CreateImages(NULL,IDB_IMAGES_TAB_NORMAL,IDB_IMAGES_TAB_DISABLE,true,16) :
-		m_TabCtrl.CreateImages(NULL, 0,0, false,0, 0));
+		m_TabCtrl.CreateImages(nullptr,IDB_IMAGES_TAB_NORMAL,IDB_IMAGES_TAB_DISABLE,true,16) :
+		m_TabCtrl.CreateImages(nullptr, 0,0, false,0, 0));
 	m_TabCtrl.Update();
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -439,10 +437,18 @@ void DemoDlg::OnBnClickedBut65()
 /////////////////////////////////////////////////////////////////////////////
 // 
 void DemoDlg::SetTabCtrlPos()
-{	CRect rc;
-	GetClientRect(&rc);
-	rc.DeflateRect(m_rcInit.left,m_rcInit.top,m_rcInit.top,m_rcInit.top);
-	m_TabCtrl.MoveWindow(&rc);
+{	CWnd *baseWnd = GetDlgItem(IDC_TABCTRL_BASE);
+		// 
+	if(baseWnd)
+	{	CRect rcBase;
+		baseWnd->GetWindowRect(&rcBase/*out*/);
+		ScreenToClient(&rcBase);
+			// 
+		CRect rc;
+		GetClientRect(&rc/*out*/);
+		rc.DeflateRect(rcBase.left,rcBase.top,rcBase.top,rcBase.top);
+		m_TabCtrl.MoveWindow(&rc);
+	}
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
@@ -498,7 +504,7 @@ void DemoDlg::OnButtonMenuClicked(TabCtrl *ctrl, CRect const *rect, CPoint /*ptS
 			if(tab==ctrl->GetSelectedTab())
 			{	info.fState |= MFS_CHECKED;
 				info.fType |= MFT_RADIOCHECK;
-				info.hbmpChecked = NULL;
+				info.hbmpChecked = nullptr;
 			}
 			info.dwTypeData = const_cast<TCHAR *>( text.GetString() );
 			info.cch = text.GetLength();
@@ -507,7 +513,7 @@ void DemoDlg::OnButtonMenuClicked(TabCtrl *ctrl, CRect const *rect, CPoint /*ptS
 			// 
 		CRect rc(rect);
 		ctrl->ClientToScreen(&rc);
-		const int id = static_cast<int>( ::TrackPopupMenu(menu,TPM_RIGHTALIGN | TPM_RETURNCMD,rc.right,rc.bottom,0,m_hWnd,NULL) );
+		const int id = static_cast<int>( ::TrackPopupMenu(menu,TPM_RIGHTALIGN | TPM_RETURNCMD,rc.right,rc.bottom,0,m_hWnd,nullptr) );
 		if(id!=0)
 		{	TabCtrl::HTAB selTab = ctrl->GetTabHandleByIndex(id-1);
 			ctrl->SelectTab(selTab);
