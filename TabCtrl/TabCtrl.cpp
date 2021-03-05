@@ -1737,7 +1737,7 @@ bool TabCtrl::IsTabExist(HTAB tab) const
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-RECT TabCtrl::GetTabRect(HTAB tab) const
+CRect TabCtrl::GetTabRect(HTAB tab) const
 {	assert( IsTabExist(tab) );
 	return p.HandleToTab(tab)->rect;
 }
@@ -1885,14 +1885,14 @@ bool TabCtrl::Private::SetCursor(TabCtrl const *ctrl, IBehavior * /*base*/)
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
-RECT TabCtrl::GetCtrlArea() const { return p.m_rcCtrlArea; }
-RECT TabCtrl::GetTabsArea() const { return p.m_rcTabs; }
-RECT TabCtrl::GetWindowsArea() const { return p.m_rcWindows; }
+CRect TabCtrl::GetCtrlArea() const { return p.m_rcCtrlArea; }
+CRect TabCtrl::GetTabsArea() const { return p.m_rcTabs; }
+CRect TabCtrl::GetWindowsArea() const { return p.m_rcWindows; }
 // 
-RECT TabCtrl::GetButtonCloseRect() const { return p.m_rcButtonClose; }
-RECT TabCtrl::GetButtonMenuRect() const { return p.m_rcButtonMenu; }
-RECT TabCtrl::GetButtonScrollLeftRect() const { return p.m_rcButtonScrollLeft; }
-RECT TabCtrl::GetButtonScrollRightRect() const { return p.m_rcButtonScrollRight; }
+CRect TabCtrl::GetButtonCloseRect() const { return p.m_rcButtonClose; }
+CRect TabCtrl::GetButtonMenuRect() const { return p.m_rcButtonMenu; }
+CRect TabCtrl::GetButtonScrollLeftRect() const { return p.m_rcButtonScrollLeft; }
+CRect TabCtrl::GetButtonScrollRightRect() const { return p.m_rcButtonScrollRight; }
 // 
 int TabCtrl::GetBorderWidth() const { return p.m_pRecalcManager->GetBorderWidth(this,&p); }
 CRect TabCtrl::GetControlAreaPadding() const { return p.m_pRecalcManager->GetControlAreaPadding(this,&p); }

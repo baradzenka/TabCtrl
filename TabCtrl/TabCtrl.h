@@ -202,7 +202,7 @@ public:
 	HTAB GetTabWithWindowID(int id) const;   // get tab whose window has id.
 	int CompareTabsPosition(HTAB tab1, HTAB tab2) const;   // return <0 - index of tab1 less than tab2, 0 - indexes are equal.
 		// 
-	RECT GetTabRect(HTAB tab) const;
+	CRect GetTabRect(HTAB tab) const;
 	bool IsTabVisible(HTAB tab, bool *partially/*out, or null*/) const;   // tab can be moved off the left or right edge of the control in BehaviorScroll mode.
 	void EnsureTabVisible(HTAB tab);   // shift tab in a visible area (use for the BehaviorScroll mode).
 		// 
@@ -237,16 +237,16 @@ public:
 		// 
 	bool IsActive() const;   // return true - one of child windows is active (has focus), works only if IsWatchActivityCtrl()==true.
 		// 
-	RECT GetCtrlArea() const;   // control area includes tabs area and control (system) buttons.
-	RECT GetTabsArea() const;
-	RECT GetWindowsArea() const;   // returns area for child windows.
+	CRect GetCtrlArea() const;   // control area includes tabs area and control (system) buttons.
+	CRect GetTabsArea() const;
+	CRect GetWindowsArea() const;   // returns area for child windows.
 		// 
 	int CalcCtrlAreaHeight();   // return necessary height of control area.
 		// 
-	RECT GetButtonCloseRect() const;
-	RECT GetButtonMenuRect() const;
-	RECT GetButtonScrollLeftRect() const;
-	RECT GetButtonScrollRightRect() const;
+	CRect GetButtonCloseRect() const;
+	CRect GetButtonMenuRect() const;
+	CRect GetButtonScrollLeftRect() const;
+	CRect GetButtonScrollRightRect() const;
 		// 
 	bool LoadState(CWinApp *app, TCHAR const *section, TCHAR const *entry);   // load state from registry.
 	bool SaveState(CWinApp *app, TCHAR const *section, TCHAR const *entry) const;   // save state in registry.
@@ -285,7 +285,7 @@ private:
 ///////////////////////////////////////
 protected:
 	DECLARE_MESSAGE_MAP()
-	BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD style, const RECT& rect, CWnd *parentWnd, UINT id, CCreateContext *context) override;
+	BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD style, const RECT &rect, CWnd *parentWnd, UINT id, CCreateContext *context) override;
 	afx_msg void OnDestroy();
 	BOOL PreTranslateMessage(MSG *msg) override;
 	afx_msg void OnSize(UINT nType, int cx, int cy);
