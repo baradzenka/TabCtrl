@@ -287,7 +287,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD style, const RECT &rect, CWnd *parentWnd, UINT id, CCreateContext *context) override;
 	afx_msg void OnDestroy();
-	BOOL PreTranslateMessage(MSG *msg) override;
+	LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam) override;
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnPaint();
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);

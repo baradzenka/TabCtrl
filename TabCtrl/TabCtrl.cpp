@@ -68,8 +68,8 @@ struct TabCtrl::Private :
 	private:
 		struct Data : CRITICAL_SECTION
 		{	Data()
-			{	hook = ::SetWindowsHookEx(WH_KEYBOARD,static_cast<HOOKPROC>(HookProc),nullptr,::GetCurrentThreadId());
-				::InitializeCriticalSection(this);
+			{	::InitializeCriticalSection(this);
+				hook = ::SetWindowsHookEx(WH_KEYBOARD,static_cast<HOOKPROC>(HookProc),nullptr,::GetCurrentThreadId());
 			}
 			~Data()
 			{	if(hook)
@@ -127,8 +127,8 @@ struct TabCtrl::Private :
 	private:
 		struct Data : CRITICAL_SECTION
 		{	Data()
-			{	hook = ::SetWindowsHookEx(WH_CALLWNDPROC,static_cast<HOOKPROC>(HookProc),nullptr,::GetCurrentThreadId());
-				::InitializeCriticalSection(this);
+			{	::InitializeCriticalSection(this);
+				hook = ::SetWindowsHookEx(WH_CALLWNDPROC,static_cast<HOOKPROC>(HookProc),nullptr,::GetCurrentThreadId());
 			}
 			~Data()
 			{	if(hook)
@@ -1350,12 +1350,20 @@ int TabCtrl::Private::CalcTabWidth(HTAB tab)
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
+// Don't use CWnd::PreTranslateMessage to call CToolTipCtrl::RelayEvent.
+//  If TabCtrl is in a Regular MFC DLL, then CWnd::PreTranslateMessage is not called. 
 // 
-BOOL TabCtrl::PreTranslateMessage(MSG *pMsg)
+LRESULT TabCtrl::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {	if(p.m_bToolTip)
 		if(p.m_pToolTip && p.m_pToolTip->m_hWnd)
-			p.m_pToolTip->RelayEvent(pMsg);
-	return CWnd::PreTranslateMessage(pMsg);
+			if(message==WM_LBUTTONDOWN || message==WM_LBUTTONUP || message==WM_MBUTTONDOWN || message==WM_MBUTTONUP ||   // All messages required for TTM_RELAYEVENT.
+				message==WM_MOUSEMOVE || message==WM_NCMOUSEMOVE || message==WM_RBUTTONDOWN || message==WM_RBUTTONUP)
+			{
+				// Don't use AfxGetCurrentMessage(). If TabCtrl is in a Regular MFC DLL, then we get an empty MSG. 
+				MSG msg = {m_hWnd,message,wParam,lParam,0,{0,0}};
+				p.m_pToolTip->RelayEvent(&msg);
+			}
+	return CWnd::WindowProc(message,wParam,lParam);
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
