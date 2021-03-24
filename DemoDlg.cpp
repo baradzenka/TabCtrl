@@ -156,11 +156,12 @@ BOOL DemoDlg::OnInitDialog()
 	pCombo->AddString(_T("20. Kind of 18"));
 	pCombo->AddString(_T("21. Like bars VS2010"));
 	pCombo->AddString(_T("22. Like client area VS2019 light"));
-	pCombo->AddString(_T("23. Like client area VS2019 dark"));
-	pCombo->AddString(_T("24. Like client area VS2019 blue"));
-	pCombo->AddString(_T("25. Like bars VS2019 light"));
-	pCombo->AddString(_T("26. Like bars VS2019 dark"));
-	pCombo->AddString(_T("27. Like bars VS2019 blue"));
+	pCombo->AddString(_T("23. Kind of 22"));
+	pCombo->AddString(_T("24. Like client area VS2019 dark"));
+	pCombo->AddString(_T("25. Like client area VS2019 blue"));
+	pCombo->AddString(_T("26. Like bars VS2019 light"));
+	pCombo->AddString(_T("27. Like bars VS2019 dark"));
+	pCombo->AddString(_T("28. Like bars VS2019 blue"));
 	pCombo->SetCurSel(0);
 		// 
 	SetButtonCheck(IDC_BUT11, m_TabCtrl.GetLayout()==TabCtrl::LayoutTop );
@@ -227,11 +228,12 @@ void DemoDlg::OnCbnSelchangeCombo1()
 		case 19: m_TabCtrl.styleVS2010_client_custom2.Install(&m_TabCtrl); break;
 		case 20: m_TabCtrl.styleVS2010_bars.Install(&m_TabCtrl); break;
 		case 21: m_TabCtrl.styleVS2019_client_light.Install(&m_TabCtrl); break;
-		case 22: m_TabCtrl.styleVS2019_client_dark.Install(&m_TabCtrl); break;
-		case 23: m_TabCtrl.styleVS2019_client_blue.Install(&m_TabCtrl); break;
-		case 24: m_TabCtrl.styleVS2019_bars_light.Install(&m_TabCtrl); break;
-		case 25: m_TabCtrl.styleVS2019_bars_dark.Install(&m_TabCtrl); break;
-		case 26: m_TabCtrl.styleVS2019_bars_blue.Install(&m_TabCtrl); break;
+		case 22: m_TabCtrl.styleVS2019_client_light_custom1.Install(&m_TabCtrl); break;
+		case 23: m_TabCtrl.styleVS2019_client_dark.Install(&m_TabCtrl); break;
+		case 24: m_TabCtrl.styleVS2019_client_blue.Install(&m_TabCtrl); break;
+		case 25: m_TabCtrl.styleVS2019_bars_light.Install(&m_TabCtrl); break;
+		case 26: m_TabCtrl.styleVS2019_bars_dark.Install(&m_TabCtrl); break;
+		case 27: m_TabCtrl.styleVS2019_bars_blue.Install(&m_TabCtrl); break;
 	}
 	m_TabCtrl.Update();
 }

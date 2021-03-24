@@ -749,6 +749,11 @@ struct TabCtrlStyle_VS2019_client_light : TabCtrlStyle_VS2019_client_base
 };
 /////////////////////////////////////////////////////////////////////////////
 // 
+struct TabCtrlStyle_VS2019_client_light_custom1 : TabCtrlStyle_VS2019_client_light
+{	CRect GetControlAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
+};
+/////////////////////////////////////////////////////////////////////////////
+// 
 struct TabCtrlStyle_VS2019_client_dark : TabCtrlStyle_VS2019_client_base
 {		// TabCtrlStyle_base.
 	COLORREF GetCtrlAreaBackColor(TabCtrl const *ctrl) override;

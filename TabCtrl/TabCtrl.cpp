@@ -4583,7 +4583,7 @@ void TabCtrlStyle_VS2010_client::DrawTabBack(TabCtrl const * /*ctrl*/, CDC *dc, 
 			dc->MoveTo(rc.left,rc.top);
 			dc->LineTo(rc.left,rc.bottom-1);
 			dc->LineTo(rc.right-1,rc.bottom-1);
-			dc->LineTo(rc.right-1,rc.top);
+			dc->LineTo(rc.right-1,rc.top-1);
 			dc->SelectObject(pOldPen);
 				// draw back.
 			rc.DeflateRect(1,0,1,1);
@@ -5091,6 +5091,16 @@ COLORREF TabCtrlStyle_VS2019_client_light::GetTabSelectedPassiveBackColor(TabCtr
 // 
 COLORREF TabCtrlStyle_VS2019_client_light::GetButtonFrameHighlightBackColor(TabCtrl const * /*ctrl*/)
 {	return RGB(201,222,245);
+}
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+// TabCtrlStyle_VS2019_client_light_custom1
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
+CRect TabCtrlStyle_VS2019_client_light_custom1::GetControlAreaPadding(TabCtrl const *ctrl, IRecalc * /*base*/)
+{	return (ctrl->GetLayout()==TabCtrl::LayoutTop ? CRect(0,0,0,2) : CRect(0,2,0,0));
 }
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////

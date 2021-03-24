@@ -41,6 +41,7 @@ struct TabCtrlComplex : TabCtrl
 	TabCtrlStyle_VS2010_bars styleVS2010_bars;
 		// 
 	TabCtrlStyle_VS2019_client_light styleVS2019_client_light;
+	TabCtrlStyle_VS2019_client_light_custom1 styleVS2019_client_light_custom1;
 	TabCtrlStyle_VS2019_client_dark styleVS2019_client_dark;
 	TabCtrlStyle_VS2019_client_blue styleVS2019_client_blue;
 	TabCtrlStyle_VS2019_bars_light styleVS2019_bars_light;
