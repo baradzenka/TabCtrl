@@ -8,10 +8,14 @@
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 #endif
 
-
-#define WINVER 0x0501
-#define WIN32_WINNT 0x0501
-#define WIN32_IE 0x0500
+#if _MSC_VER <= 1400   // Visual Studio 2005 and earlier.
+	#define WINVER 0x0400
+	#define WIN32_WINNT 0x0400
+#else   // Visual Studio 2008 and later.
+	#define WINVER 0x0501
+	#define WIN32_WINNT 0x0501
+#endif
+#define WIN32_IE 0x0200
 
 
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// some CString constructors will be explicit

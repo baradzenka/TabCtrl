@@ -2796,7 +2796,7 @@ CToolTipCtrl *TabCtrlStyle_base::CreateToolTip(TabCtrl *ctrl)
 		}
 			// 
 		DWORD dwClassStyle = ::GetClassLong(toolTip->m_hWnd,GCL_STYLE);
-		dwClassStyle |= CS_DROPSHADOW;   // enables the drop shadow effect.
+		dwClassStyle |= 0x00020000/*CS_DROPSHADOW*/;   // enables the drop shadow effect.
 		::SetClassLong(toolTip->m_hWnd,GCL_STYLE,dwClassStyle);
 		return toolTip;
 	#endif
