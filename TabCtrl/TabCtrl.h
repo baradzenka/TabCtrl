@@ -299,6 +299,7 @@ protected:
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMButtonDown(UINT nFlags, CPoint point);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnCaptureChanged(CWnd *pWnd);
 	LRESULT OnMouseLeave(WPARAM wp, LPARAM lp);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

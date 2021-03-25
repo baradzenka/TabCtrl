@@ -332,6 +332,7 @@ BEGIN_MESSAGE_MAP(TabCtrl, CWnd)
 	ON_WM_RBUTTONDOWN()
 	ON_WM_RBUTTONUP()
 	ON_WM_MBUTTONDOWN()
+	ON_WM_MOUSEWHEEL()
 	ON_WM_CAPTURECHANGED()
 	ON_MESSAGE(WM_MOUSELEAVE, OnMouseLeave)
 	ON_WM_TIMER()
@@ -2162,6 +2163,20 @@ void TabCtrl::OnMButtonDown(UINT nFlags, CPoint point)
 {	p.SetFocusInChildWnd();
 		// 
 	CWnd::OnMButtonDown(nFlags, point);
+}
+/////////////////////////////////////////////////////////////////////////////
+//
+BOOL TabCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
+{	if(GetBehavior()==Behavior::BehaviorScroll)
+	{	CPoint pt(point);
+		ScreenToClient(&pt);
+		if( p.m_rcTabs.PtInRect(pt) )
+		{	(zDelta>0 ? p.StepLeft() : p.StepRight());
+			Update();
+		}
+	}
+		// 
+	return CWnd::OnMouseWheel(nFlags, zDelta, point);
 }
 /////////////////////////////////////////////////////////////////////////////
 // 
