@@ -222,6 +222,8 @@ public:
 	bool IsHideSingleTab() const;
 	void EnableToolTip(bool enable);
 	bool IsToolTipEnable() const;
+	void EnableMouseWheelScrolling(bool enable);
+	bool IsMouseWheelScrollingEnable() const;
 		// 
 	void ShowButtonClose(bool show);
 	bool IsButtonCloseVisible() const;

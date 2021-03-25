@@ -232,6 +232,7 @@ public:
 	bool m_bEnableTabRemove;
 	bool m_bHideSingleTab;
 	bool m_bToolTip;
+	bool m_bMouseWheelScrolling;
 	bool m_bShowButtonClose;
 	bool m_bShowButtonMenu;
 	bool m_bShowButtonsScroll;
@@ -377,6 +378,7 @@ TabCtrl::Private::Private(TabCtrl &owner) : o(owner)
 	m_bEnableTabRemove = false;
 	m_bHideSingleTab = false;
 	m_bToolTip = true;
+	m_bMouseWheelScrolling = true;
 	m_bShowButtonClose = true;
 	m_bShowButtonMenu = true;
 	m_bShowButtonsScroll = true;
@@ -1524,6 +1526,15 @@ bool TabCtrl::IsToolTipEnable() const
 {	return p.m_bToolTip;
 }
 /////////////////////////////////////////////////////////////////////////////
+//
+void TabCtrl::EnableMouseWheelScrolling(bool enable)
+{	p.m_bMouseWheelScrolling = enable;
+}
+// 
+bool TabCtrl::IsMouseWheelScrollingEnable() const
+{	return p.m_bMouseWheelScrolling;
+}
+/////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 // 
 void TabCtrl::ShowButtonsScroll(bool show)
@@ -2167,14 +2178,16 @@ void TabCtrl::OnMButtonDown(UINT nFlags, CPoint point)
 /////////////////////////////////////////////////////////////////////////////
 //
 BOOL TabCtrl::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
-{	if(GetBehavior()==Behavior::BehaviorScroll)
-	{	CPoint pt(point);
-		ScreenToClient(&pt);
-		if( p.m_rcTabs.PtInRect(pt) )
-		{	(zDelta>0 ? p.StepLeft() : p.StepRight());
-			Update();
+{	if( IsMouseWheelScrollingEnable() )
+		if(GetBehavior()==BehaviorScroll)
+		{	CPoint pt(point);
+			ScreenToClient(&pt);
+			if( p.m_rcTabs.PtInRect(pt) )
+			{	(zDelta>0 ? p.StepLeft() : p.StepRight());
+				Update();
+				PostMessage(WM_MOUSEMOVE,nFlags,MAKELPARAM(pt.x,pt.y));   // update tab under cursor.
+			}
 		}
-	}
 		// 
 	return CWnd::OnMouseWheel(nFlags, zDelta, point);
 }
