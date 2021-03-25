@@ -48,11 +48,12 @@ public:
 			// 
 		virtual CRect GetTabHorzMargin(TabCtrl const *ctrl, IRecalc *base) = 0;   // uses only CRect::left and CRect::right.
 		virtual CRect GetTabPadding(TabCtrl const *ctrl, IRecalc *base) = 0;
-		virtual int GetTabImageTextSpace(TabCtrl const *ctrl, IRecalc *base) = 0;   // space between picture and text.
+		virtual int GetTabImageTextSpace(TabCtrl const *ctrl, IRecalc *base) = 0;   // space between image and text in the tab.
 		virtual int GetTabExtraWidth(TabCtrl const *ctrl, IRecalc *base, HTAB tab) = 0;   // additional width of tab.
 		virtual int GetTabMinWidth(TabCtrl const *ctrl, IRecalc *base) = 0;   // minimal width of tab.
 			// 
-		virtual CRect GetButtonCloseHorzMargin(TabCtrl const *ctrl, IRecalc *base) = 0;   // uses only CRect::left and CRect::right.
+		virtual CRect GetButtonsHorzMargin(TabCtrl const *ctrl, IRecalc *base) = 0;   // uses only CRect::left and CRect::right.
+		virtual CRect GetButtonCloseHorzMargin(TabCtrl const *ctrl, IRecalc *base) = 0;   // uses only CRect::left.
 		virtual CRect GetButtonMenuHorzMargin(TabCtrl const *ctrl, IRecalc *base) = 0;   // uses only CRect::left and CRect::right.
 		virtual CRect GetButtonScrollLeftHorzMargin(TabCtrl const *ctrl, IRecalc *base) = 0;   // uses only CRect::left and CRect::right.
 		virtual CRect GetButtonScrollRightHorzMargin(TabCtrl const *ctrl, IRecalc *base) = 0;   // uses only CRect::left and CRect::right.
@@ -265,6 +266,7 @@ public:	// functions of IRecalc interface, return information from current recal
 	int GetTabExtraWidth(HTAB tab) const;
 	int GetTabMinWidth() const;
 		// 
+	CRect GetButtonsHorzMargin() const;
 	CRect GetButtonCloseHorzMargin() const;
 	CRect GetButtonMenuHorzMargin() const;
 	CRect GetButtonScrollLeftHorzMargin() const;
@@ -321,6 +323,7 @@ interface ITabCtrlStyle
 		int GetTabExtraWidth(TabCtrl const *ctrl, IRecalc *base, TabCtrl::HTAB tab) override { return base->GetTabExtraWidth(ctrl,nullptr,tab); }
 		int GetTabMinWidth(TabCtrl const *ctrl, IRecalc *base) override { return base->GetTabMinWidth(ctrl,nullptr); }
 			// 
+		CRect GetButtonsHorzMargin(TabCtrl const *ctrl, IRecalc *base) override { return base->GetButtonsHorzMargin(ctrl,nullptr); }
 		CRect GetButtonCloseHorzMargin(TabCtrl const *ctrl, IRecalc *base) override { return base->GetButtonCloseHorzMargin(ctrl,nullptr); }
 		CRect GetButtonMenuHorzMargin(TabCtrl const *ctrl, IRecalc *base) override { return base->GetButtonMenuHorzMargin(ctrl,nullptr); }
 		CRect GetButtonScrollLeftHorzMargin(TabCtrl const *ctrl, IRecalc *base) override { return base->GetButtonScrollLeftHorzMargin(ctrl,nullptr); }
@@ -418,6 +421,7 @@ struct TabCtrlStyle_VS2003_client : TabCtrlStyle_VS2003_base
 	CRect GetControlAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetWindowsAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetTabPadding(TabCtrl const *ctrl, IRecalc *base) override;
+	CRect GetButtonsHorzMargin(TabCtrl const *ctrl, IRecalc *base) override;
 
 		// TabCtrl::Draw.
 	void DrawControlAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect) override;
@@ -444,6 +448,7 @@ struct TabCtrlStyle_VS2003_bars : TabCtrlStyle_VS2003_base
 	int GetBorderWidth(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetControlAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetTabPadding(TabCtrl const *ctrl, IRecalc *base) override;
+	CRect GetButtonsHorzMargin(TabCtrl const *ctrl, IRecalc *base) override;
 
 		// TabCtrl::Draw.
 	void DrawControlAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect) override;
@@ -482,6 +487,7 @@ struct TabCtrlStyle_VS2008_client_base : TabCtrlStyle_base
 	CRect GetTabPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	int GetTabExtraWidth(TabCtrl const *ctrl, IRecalc *base, TabCtrl::HTAB tab) override;
 	int GetTabMinWidth(TabCtrl const *ctrl, IRecalc *base) override;
+	CRect GetButtonsHorzMargin(TabCtrl const *ctrl, IRecalc *base) override;
 
 		// TabCtrl::IBehavior.
 	TabCtrl::HTAB HitTest(TabCtrl const *ctrl, IBehavior *base, CPoint point) override;   // get tab in the given point.
@@ -653,6 +659,7 @@ struct TabCtrlStyle_VS2010_client : TabCtrlStyle_base
 	CRect GetControlAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetWindowsAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetTabPadding(TabCtrl const *ctrl, IRecalc *base) override;
+	CRect GetButtonsHorzMargin(TabCtrl const *ctrl, IRecalc *base) override;
 
 		// TabCtrl::Draw.
 	void DrawControlAreaBack(TabCtrl const *ctrl, CDC *dc, CRect const *rect) override;
@@ -852,7 +859,6 @@ struct TabCtrlStyle_VS2019_bars_dark : TabCtrlStyle_VS2019_bars_base
 struct TabCtrlStyle_VS2019_bars_blue : TabCtrlStyle_VS2019_bars_base
 {		// TabCtrl::IRecalc.
 	int GetBorderWidth(TabCtrl const *ctrl, IRecalc *base) override;
-	CRect GetControlAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetWindowsAreaPadding(TabCtrl const *ctrl, IRecalc *base) override;
 	CRect GetTabPadding(TabCtrl const *ctrl, IRecalc *base) override;
 
