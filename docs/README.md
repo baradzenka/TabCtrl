@@ -6,7 +6,7 @@
 
 Tabs can be top or bottom of child windows. The user can drag tabs using the mouse. Control has a zoom (shrink of tabs) and scrolling tabs mode. Also, if there is one tab the area of tabs can be hidden.
 
-Control has 27 built-in tab drawing styles, including tabs VS2003, VS2008, VS2010 and VS2019. Drawing for all styles is created programmatically and does not require resources. You can create your own style by editing an existing render class or creating a new one.
+Control has 28 built-in tab drawing styles, including tabs VS2003, VS2008, VS2010 and VS2019. Drawing for all styles is created programmatically and does not require resources. You can create your own style by editing an existing render class or creating a new one.
 
 This control is based on `CWnd` class and can be placed as a child window anywhere, for example in the client area of the frame or dialog.
 
