@@ -2538,6 +2538,7 @@ bool TabCtrl::Private::LoadImage(HMODULE moduleRes/*or null*/, UINT resID, bool 
 	}
 	if(*bmp && (*bmp)->GetLastStatus()!=Gdiplus::Ok)
 	{	::delete *bmp;
+		*bmp = nullptr;
 		return false;
 	}
 	return (*bmp)!=nullptr;
