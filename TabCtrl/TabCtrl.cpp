@@ -2508,30 +2508,31 @@ bool TabCtrl::Private::LoadImage(HMODULE moduleRes/*or null*/, UINT resID, bool 
 	{	if(!pngImage)   // bmp.
 			*bmp = ::new (std::nothrow) Gdiplus::Bitmap(moduleRes,MAKEINTRESOURCEW(resID));
 		else   // png.
-		{	HRSRC hRsrc = ::FindResource(moduleRes,MAKEINTRESOURCE(resID),_T("PNG"));
-			if(hRsrc)
-			{	HGLOBAL hGlobal = ::LoadResource(moduleRes,hRsrc);
-				if(hGlobal)
-				{	const void *lpBuffer = ::LockResource(hGlobal);
-					if(lpBuffer)
-					{	const UINT uiSize = static_cast<UINT>( ::SizeofResource(moduleRes,hRsrc) );
-						HGLOBAL hRes = ::GlobalAlloc(GMEM_MOVEABLE, uiSize);
-						if(hRes)
-						{	void *lpResBuffer = ::GlobalLock(hRes);
-							if(lpResBuffer)
-							{	memcpy(lpResBuffer, lpBuffer, uiSize);
-								IStream *pStream = nullptr;
-								if(::CreateStreamOnHGlobal(hRes, FALSE, &pStream/*out*/)==S_OK)
-								{	*bmp = ::new (std::nothrow) Gdiplus::Bitmap(pStream,FALSE);
-									pStream->Release();
+		{	HRSRC rsrc = ::FindResource(moduleRes,MAKEINTRESOURCE(resID),_T("PNG"));
+			if(rsrc)
+			{	HGLOBAL rsrcMem = ::LoadResource(moduleRes,rsrc);
+				if(rsrcMem)
+				{	const void *rsrcBuffer = ::LockResource(rsrcMem);
+					if(rsrcBuffer)
+					{	const UINT rsrcSize = static_cast<UINT>( ::SizeofResource(moduleRes,rsrc) );
+						HGLOBAL streamMem = ::GlobalAlloc(GMEM_MOVEABLE,rsrcSize);
+						if(streamMem)
+						{	void *streamBuffer = ::GlobalLock(streamMem);
+							if(streamBuffer)
+							{	memcpy(streamBuffer,rsrcBuffer,rsrcSize);
+								::GlobalUnlock(streamBuffer);
+									// 
+								IStream *stream = nullptr;
+								if(::CreateStreamOnHGlobal(streamMem,FALSE,&stream/*out*/)==S_OK)
+								{	*bmp = ::new (std::nothrow) Gdiplus::Bitmap(stream,FALSE);
+									stream->Release();
 								}
-								::GlobalUnlock(lpResBuffer);
 							}
-							::GlobalFree(hRes);
+							::GlobalFree(streamMem);
 						}
-						::UnlockResource(hGlobal);
+						::UnlockResource(rsrcMem);
 					}
-					::FreeResource(hGlobal);
+					::FreeResource(rsrcMem);
 				}
 			}
 		}
@@ -2552,48 +2553,46 @@ bool TabCtrl::Private::CreateImageList(Gdiplus::Bitmap *bmp, int imageWidth,
 	assert(imageWidth>0);
 	assert(imageList);
 		// 
-	if(imageList->m_hImageList)
-		imageList->DeleteImageList();
-		// 
 	bool res = false;
 	const Gdiplus::Rect rect(0,0,bmp->GetWidth(),bmp->GetHeight());
 	if( imageList->Create(imageWidth,bmp->GetHeight(),ILC_COLOR24 | ILC_MASK,1,0) )
-	{	Gdiplus::Bitmap *bmpCnvrt = bmp->Clone(rect,PixelFormat32bppARGB);
-		if(bmpCnvrt)
-		{	if(bmpCnvrt->GetLastStatus()==Gdiplus::Ok)
-			{	Gdiplus::BitmapData data;
-				if(bmpCnvrt->LockBits(&rect,Gdiplus::ImageLockModeRead | Gdiplus::ImageLockModeWrite,PixelFormat32bppARGB,&data)==Gdiplus::Ok)
-				{	CBitmap cbmp;
-					if( cbmp.CreateBitmap(rect.Width,rect.Height,1,32,nullptr) )
-					{	const UINT maskRGB = (clrMask & 0x0000ff00) | (clrMask & 0xff)<<16 | (clrMask & 0x00ff0000)>>16;
-						const UINT number = data.Width * data.Height;
-						UINT32 *ptr = static_cast<UINT32 *>(data.Scan0);
-						for(UINT32 *e=ptr+number; ptr!=e; ++ptr)
-						{	const unsigned char a = static_cast<unsigned char>(*ptr >> 24);
-							if(a==0)
-								*ptr = maskRGB;
-							else if(a==255)
-							{	if(clrMask!=CLR_NONE)
-									if((*ptr & 0x00ffffff)==maskRGB)
-										*ptr = maskRGB;
-							}
-							else   // a!=255.
-								if(clrBack!=CLR_NONE)
-								{	const UINT _a = 255u - a;
-									const UINT r = ((*ptr & 0xff) * a + (clrBack>>16 & 0xff) * _a) / 255u;
-									const UINT g = ((*ptr>>8 & 0xff) * a + (clrBack>>8 & 0xff) * _a) / 255u;
-									const UINT b = ((*ptr>>16 & 0xff) * a + (clrBack & 0xff) * _a) / 255u;
-									*ptr = r | (g<<8) | (b<<16);
-								}
+	{	Gdiplus::BitmapData bmpData;
+		if(bmp->LockBits(&rect,Gdiplus::ImageLockModeRead,PixelFormat32bppARGB,&bmpData/*out*/)==Gdiplus::Ok)
+		{	const int sizeBuffer = abs(bmpData.Stride) * static_cast<int>(bmpData.Height);
+			char *buffer = ::new (std::nothrow) char[sizeBuffer];
+			if(buffer)
+			{	memcpy(buffer,bmpData.Scan0,sizeBuffer);
+					// 
+				CBitmap imageListBitmap;
+				if( imageListBitmap.CreateBitmap(rect.Width,rect.Height,1,32,nullptr) )
+				{	const UINT maskRGB = (clrMask & 0x0000ff00) | (clrMask & 0xff)<<16 | (clrMask & 0x00ff0000)>>16;
+					const UINT pixelNumber = bmpData.Width * bmpData.Height;
+					UINT32 *ptr = reinterpret_cast<UINT32 *>(buffer);
+					for(UINT32 *e=ptr+pixelNumber; ptr!=e; ++ptr)
+					{	const unsigned char a = static_cast<unsigned char>(*ptr >> 24);
+						if(a==0)
+							*ptr = maskRGB;
+						else if(a==255)
+						{	if(clrMask!=CLR_NONE)
+								if((*ptr & 0x00ffffff)==maskRGB)
+									*ptr = maskRGB;
 						}
-						cbmp.SetBitmapBits(number*4,data.Scan0);
-							// 
-						res = imageList->Add(&cbmp,clrMask & 0x00ffffff)!=-1;
+						else   // a!=255.
+							if(clrBack!=CLR_NONE)
+							{	const UINT _a = 255u - a;
+								const UINT r = ((*ptr & 0xff) * a + (clrBack>>16 & 0xff) * _a) / 255u;
+								const UINT g = ((*ptr>>8 & 0xff) * a + (clrBack>>8 & 0xff) * _a) / 255u;
+								const UINT b = ((*ptr>>16 & 0xff) * a + (clrBack & 0xff) * _a) / 255u;
+								*ptr = r | (g<<8) | (b<<16);
+							}
 					}
-					bmpCnvrt->UnlockBits(&data);
+					imageListBitmap.SetBitmapBits(pixelNumber*4,buffer);
+						// 
+					res = imageList->Add(&imageListBitmap,clrMask & 0x00ffffff)!=-1;
 				}
+				::delete [] buffer;
 			}
-			delete bmpCnvrt;
+			bmp->UnlockBits(&bmpData);
 		}
 	}
 	if(!res && imageList->m_hImageList)
