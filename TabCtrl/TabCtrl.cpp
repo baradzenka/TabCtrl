@@ -2833,7 +2833,7 @@ CToolTipCtrl *TabCtrlStyle_base::CreateToolTip(TabCtrl *ctrl)
 		catch(std::bad_alloc &)
 		{	return nullptr;
 		}
-		if( !toolTip->Create(ctrl,TTS_ALWAYSTIP) )
+		if( !toolTip->Create(ctrl,TTS_ALWAYSTIP | TTS_NOPREFIX) )
 		{	delete toolTip;
 			return nullptr;
 		}
