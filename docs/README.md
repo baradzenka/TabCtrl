@@ -67,5 +67,3 @@ Classes `ITabCtrlStyle::RecalcStub` and `ITabCtrlStyle::BehaviorStub` create a d
 The control requires a call of `Update()` after you add or delete tabs, as well as change its properties and state.
 
 Good luck! :-)
-
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?business=HTC7VHPDL6U54&item_name=Thank+you+for+your+donation.+This+will+help+me+develop+great+things+further.&currency_code=USD)
